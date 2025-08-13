@@ -1,0 +1,80 @@
+data:
+  data: BeamDI_NUM
+  subset: BeamDI_NUM_T8000
+  validset: BeamDI_NUM_V1000
+loss:
+  evaluations:
+  - - R2
+    - - 1
+      - 1
+      - 0
+      - 0
+      - 1
+      - 1
+      - 0
+      - 0
+    - epsilon: 1.0e-08
+      reduction: mean
+  - - MAE
+    - - 1
+      - 1
+      - 0
+      - 0
+      - 1
+      - 1
+      - 0
+      - 0
+    - reduction: mean
+  losses:
+  - - LpLoss
+    - 1
+    - - 1
+      - 1
+      - 0
+      - 0
+      - 1
+      - 1
+      - 0
+      - 0
+    - d: 2
+      p: 2
+      reduction: true
+      size_average: true
+model:
+  model: MoSRNet
+  para:
+    dim1: 16
+    dim2fct: 2
+    inlen: 9
+    num_subnets: 3
+    outlen: 540
+paths:
+  config_path: ./configs\MoSRNet-BeamDI_NUM_T8000-EXP01-250813-182815.yaml
+  results_path: ./results\MoSRNet-BeamDI_NUM\MoSRNet-BeamDI_NUM_T8000-EXP01-250813-182815
+project:
+  case: MoSRNet-BeamDI_NUM_T8000-EXP01-250813-182815
+  description: 'SHM Framework of MoSRNet and MS-FNO '
+  project: MoSRNet-BeamDI_NUM
+randomseed: 114514
+scheduler:
+  decay_rate: 0.9798
+  initial_ratio: 1.0e-05
+  scheduler: ExpLRScheduler
+  warmup_epochs: 20
+train:
+  batch_size: 16
+  down_idx:
+  - 0
+  - 68
+  - 135
+  - 203
+  - 270
+  - 337
+  - 405
+  - 473
+  - 540
+  epochs: 150
+  gt_idx: 540
+  in_channels: 3
+  learning_rate: 0.001
+  weight_decay: 0.01

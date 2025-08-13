@@ -1,3 +1,11 @@
+'''
+Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
+Date: 2025-08-12 18:06:32
+LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
+LastEditTime: 2025-08-13 17:14:12
+FilePath: \MS-FNO&MoSRNet_clean\models\Baselines.py
+'''
+
 
 import torch
 import torch.nn as nn
@@ -83,85 +91,3 @@ class ResNet(nn.Module):
         for _ in range(1, blocks):
             layers.append(BasicBlock1D(out_ch, out_ch, stride=1))
         return nn.Sequential(*layers)
-
-    def forward(self, x):
-        """
-        输入:
-          mode_shapes: (batch, in_channels, mode_length)
-          frequencies: (batch, in_channels, freq_length)
-        输出:
-          out: (batch, mode_length, out_channels)
-        """
-        # Embedding & 初步处理
-        x = F.gelu(self.mode_embed(x.transpose(1, 2))).transpose(1, 2)
-
-        # 初始大卷积
-        x = self.initial_conv(x)
-        # ResNet18-1D 风格特征提取
-        x = self.resnet_layers(x)
-
-        # 准备 LayerNorm，shape 转为 (batch, mode_length, embed_dim)
-        x = x.transpose(1, 2)
-        x = self.norm1(x)
-
-        # 输出预测
-        x = self.projection1(x)
-        out = self.projection2(x)
-        return out
-
-
-    
-
-class DNN(nn.Module):
-    def __init__(self, in_channels, mode_length, embed_dim, fno_modes, fno_layers, out_channels):
-        """
-        参数说明:
-          in_channels: 输入通道数
-          mode_length: 模型mode的长度
-          freq_length: 频率信息维度
-          embed_dim: 嵌入维度
-          fno_modes: （保留，与原模型一致）
-          fno_layers: 作为全连接层的层数（可以调深）
-          out_channels: 输出通道数
-        """
-        super().__init__()
-        # Embedding layers
-        self.mode_embed = nn.Linear(in_channels, embed_dim)
-        
-        # DNN部分：对每个时间步独立应用多层全连接网络
-        layers = []
-        for _ in range(5):
-            layers.append(nn.Linear(embed_dim, embed_dim))
-            layers.append(nn.ReLU())
-        self.dnn_layers = nn.Sequential(*layers)
-
-        # Layer normalization (在全连接网络之后对每个时间步进行归一化)
-        self.norm1 = nn.LayerNorm(embed_dim)
-        
-        # 输出层
-        self.projection1 = nn.Linear(embed_dim, embed_dim // 2)
-        self.projection2 = nn.Linear(embed_dim // 2, out_channels)
-
-    def forward(self, x):
-        """
-        输入:
-          mode_shapes: (batch, in_channels, mode_length)
-          frequencies: (batch, in_channels, freq_length)
-        输出:
-          out: (batch, mode_length, out_channels)
-        """
-        # Embedding & 融合
-        x = F.gelu(self.mode_embed(x.transpose(1, 2))).transpose(1, 2)
-
-        # 将fused调整为 (batch, mode_length, embed_dim) 以应用DNN（对每个时间步独立处理）
-        x = x.transpose(1, 2)
-        x = self.dnn_layers(x)
-        
-        # Layer normalization
-        x = self.norm1(x)
-        
-        # 输出层
-        x = self.projection1(x)
-        out = self.projection2(x)
-        return out
-    

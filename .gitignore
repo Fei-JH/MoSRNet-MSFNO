@@ -1,3 +1,5 @@
 .venv/
 .vscode/
 wandb/
+__pycache__/
+*.py[cod]

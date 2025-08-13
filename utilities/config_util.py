@@ -1,12 +1,13 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Feb 13 15:28:00 2025 (JST)
+'''
+Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
+Date: 2025-08-12 18:07:20
+LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
+LastEditTime: 2025-08-13 18:06:46
+'''
 
-@author: Jinghao FEI
-"""
+
 import os
 import yaml
-#%%
 
 
 def is_subset_dict(small, big):
@@ -23,10 +24,10 @@ def is_subset_dict(small, big):
         else:
             if big[key] != value:
                 return False
-    return True
+    return True 
 
 
-def check_config_file(config_dir, config, model_name, subset, tasktype, gentime):
+def check_config_file(config_dir, config, model_name, subset, gentime):
     """
     This function searches for YAML configuration files in the specified directory
     whose filenames contain the substring f"{model_name}-{subset}-{tasktype}".
@@ -57,7 +58,7 @@ def check_config_file(config_dir, config, model_name, subset, tasktype, gentime)
 
     # 遍历配置目录下所有 YAML 文件
     for fname in os.listdir(config_dir):
-        if fname.endswith('.yaml') and f"{model_name}-{subset}-{tasktype}" in fname:
+        if fname.endswith('.yaml') and f"{model_name}-{subset}" in fname:
             candidate_files.append(fname)
             full_path = os.path.join(config_dir, fname)
             with open(full_path, 'r', encoding='utf-8') as f:
@@ -72,8 +73,8 @@ def check_config_file(config_dir, config, model_name, subset, tasktype, gentime)
         return 1, identical_file
     else:
         # n 的值为满足条件的文件数 + 1
-        new_n = len(candidate_files) + 1
-        new_fname = f"EXP{new_n}-{model_name}-{subset}-{tasktype}-{gentime}.yaml"
+        new_n = f"{len(candidate_files) + 1:02d}"
+        new_fname = f"{model_name}-{subset}-EXP{new_n}-{gentime}.yaml"
         return 0,  new_fname
 
 
@@ -85,49 +86,3 @@ def save_config_to_yaml(config, config_path):
         yaml.dump(config, f, default_flow_style=False, allow_unicode=True)
     print(f"Configuration successfully saved to {config_path}") 
     
-    
-def update_training_status(config, phase="start"):
-    """
-    更新 config["status"] 中的训练状态信息，包括训练次数和时间戳记录。
-    
-    Parameters:
-        config (dict): 配置字典，需包含或初始化 "status" 键。
-        phase (str): 状态更新类型，"start" 表示训练开始，"end" 表示训练结束。
-    
-    Returns:
-        dict: 更新后的配置字典。
-    """
-    from datetime import datetime
-    # Get current timestamp
-    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    
-    # Initialize the status field if not present
-    if "status" not in config:
-        config["status"] = {
-            "train_count": 0,
-            "train_history": []
-        }
-    
-    # Access the status dictionary
-    status_info = config["status"]
-    
-    if phase == "start":
-        # Increment training count and add a new training record with start_time
-        status_info["train_count"] += 1
-        status_info["train_history"].append({
-            "start_time": now,  # Record the training start time
-            "end_time": None    # End time is unknown at training start
-        })
-        print(f"Training started at {now}.")
-        
-    elif phase == "end":
-        # Update the last training record with end_time if it exists and is not finished
-        if status_info["train_history"] and status_info["train_history"][-1]["end_time"] is None:
-            status_info["train_history"][-1]["end_time"] = now
-            print(f"Training ended at {now}.")
-        else:
-            print("Warning: No ongoing training session found to end.")
-    else:
-        print("Invalid phase specified. Use 'start' or 'end'.")
-    
-    return config

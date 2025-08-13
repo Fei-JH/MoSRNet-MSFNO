@@ -1,23 +1,25 @@
- # -*- coding: utf-8 -*-
-"""
-Created on Fri Jun 21 17:46:00 2024 (JST)
+'''
+Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
+Date: 2025-08-12 18:06:11
+LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
+LastEditTime: 2025-08-13 18:09:21
+'''
 
-@author: Jinghao FEI
-"""
 
-import yaml
 import os
 from datetime import datetime
 from utilities.config_util import check_config_file
 from utilities.config_util import save_config_to_yaml
 
 #%%
-description = "BeamDI02_V1000"
+""" Input all the parameters in this block"""
+
+description = "SHM Framework of MoSRNet and MS-FNO"
 model = "MSFNO"
 # Data parameters
-data = "BeamDI02"
-subset = "BeamDI02_T500"
-validset = "BeamDI02_V1000"
+data = "BeamDI_NUM"
+subset = "BeamDI_NUM_T8000"
+validset = "BeamDI_NUM_V1000"
 
 if not subset:
     subset = data    
@@ -63,11 +65,6 @@ model = {
         }
         }
 
-model_name = model["model"]
-
-# Project parameters
-tasktype = "DD" #DD for data-driven; PI for physic-informed
-
 randomseed=114514
 
 #%%
@@ -75,7 +72,6 @@ config = {
     # Project parameters
     "project": {
         "description": description,
-        "tasktype": tasktype
     },
 
     # Data parameters
@@ -113,14 +109,13 @@ config = {
 
 #%%
 
-
 # Case name
 current_time = datetime.now()
 gentime = current_time.strftime('%y%m%d-%H%M%S')
 
 config_dir = "./configs"
 
-exist, case_name = check_config_file(config_dir, config, config["model"]['model'], subset, tasktype, gentime)
+exist, case_name = check_config_file(config_dir, config, config["model"]['model'], subset, gentime)
 
 if exist:
     pass
@@ -129,9 +124,8 @@ else:
     config["project"]["project"] = project_name
     config["project"]["case"] = case_name[:-5]
     
-    results_dir = os.path.join("./results", project_name)
+    results_dir = os.path.join(r"./results", project_name)
     results_path = os.path.join(results_dir, case_name[:-5])
-    os.makedirs(results_path,exist_ok=True)
     config_path = os.path.join(config_dir, case_name)
     
     config["paths"] = {"config_path":config_path,
