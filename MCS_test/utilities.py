@@ -1,4 +1,10 @@
-import numpy as np
+'''
+Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
+Date: 2025-08-12 18:06:32
+LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
+LastEditTime: 2025-08-13 18:37:58
+'''
+
 
 import numpy as np
 
@@ -57,5 +63,3 @@ def generate_sequence(length=540, y=10, noise_range=0.05, dip_range=(0.15, 0.6),
     return seq, x, m
 
 
-# Example usage:
-# seq, x, m = generate_sequence()

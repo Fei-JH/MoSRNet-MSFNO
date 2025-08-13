@@ -1,55 +1,139 @@
-'''
-Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
-Date: 2025-08-12 18:06:32
-LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
-LastEditTime: 2025-08-13 17:26:47
-FilePath: \MS-FNO&MoSRNet_clean\models\MSFNO.py
-'''
+# ------------------------------------------------------------------------------------
+# This script includes code adapted from the Neural Operator project:
+# https://github.com/neuraloperator/neuraloperator
+#
+# MIT License
+
+# Copyright (c) 2023 NeuralOperator developers
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+# ------------------------------------------------------------------------------------
 
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from models.common_modules import FourierLayer
 
-# MS-FNO: Modal-stiffness Fourier Neural Operator
-class MSFNO(nn.Module):
-    def __init__(self, in_channels, mode_length,  embed_dim, fno_modes, fno_layers, out_channels):
+class SpectralConv1d(nn.Module):
+    def __init__(self, in_channels, out_channels, modes1):
+        super(SpectralConv1d, self).__init__()
         """
-        MS-FNO (Modal-stiffness Fourier Neural Operator)
-        参数:
-          in_channels: 输入中 token 数（原来的 m）
-          mode_length: 振型输入最后一维（包含位置编码）；同时作为频率提升后的目标维度（默认为16）
-          embed_dim: 嵌入后维度（默认128）
-          fno_modes: FNO层傅里叶模数（默认4）
-          fno_layers: FNO层数（默认3）
-          out_channels: 输出维度（默认1）
+        1D Fourier layer. Performs FFT, linear transform, and inverse FFT.
+        Args:
+            in_channels (int): Number of input channels.
+            out_channels (int): Number of output channels.
+            modes1 (int): Number of Fourier modes to multiply, at most floor(N/2) + 1.
         """
-        super(MSFNO, self).__init__()
-        # 嵌入层沿 token 方向（in_channels → embed_dim）
-        self.lifting = nn.Linear(in_channels, embed_dim)
-        # 先将频率从1提升到 mode_length
-        
-        self.fno_layers = nn.ModuleList([
-            FourierLayer(fno_modes, embed_dim) for _ in range(fno_layers)
-        ])
-        
-        self.projection1 = nn.Linear(embed_dim, embed_dim//2)
-        self.projection2 = nn.Linear(embed_dim//2, out_channels)
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+        self.modes1 = modes1
+
+        self.scale = (1 / (in_channels * out_channels))
+        self.weights1 = nn.Parameter(self.scale * torch.rand(in_channels, out_channels, self.modes1, dtype=torch.cfloat))
+
+    def compl_mul1d(self, input, weights):
+        """
+        Performs complex multiplication.
+        Args:
+            input (Tensor): Input tensor of shape (batch, in_channel, x).
+            weights (Tensor): Weight tensor of shape (in_channel, out_channel, x).
+        Returns:
+            Tensor: Output tensor of shape (batch, out_channel, x).
+        """
+        return torch.einsum("bix,iox->box", input, weights)
 
     def forward(self, x):
         """
-        x: (batch, in_channels, mode_length)
+        Forward pass of SpectralConv1d.
+        Args:
+            x (Tensor): Input tensor of shape (batch, in_channels, length).
+        Returns:
+            Tensor: Output tensor of shape (batch, out_channels, length).
         """
-        # 对振型：先转置，将 token 数 in_channels 放到最后，再嵌入
-        x = self.lifting(x.transpose(1, 2)).transpose(1, 2)  # (batch, embed_dim, mode_length)
+        batchsize = x.shape[0]
+        x_ft = torch.fft.rfft(x)
+        out_ft = torch.zeros(batchsize, self.out_channels, x.size(-1)//2 + 1, device=x.device, dtype=torch.cfloat)
+        out_ft[:, :, :self.modes1] = self.compl_mul1d(x_ft[:, :, :self.modes1], self.weights1)
+        x = torch.fft.irfft(out_ft, n=x.size(-1))
+        return x
 
-        # FNO层处理
+class FourierLayer(nn.Module):
+    def __init__(self, modes, width):
+        super(FourierLayer, self).__init__()
+        """
+        Fourier layer with spectral convolution and pointwise convolution.
+        Args:
+            modes (int): Number of Fourier modes.
+            width (int): Channel width.
+        """
+        self.modes1 = modes
+        self.width = width
+        self.padding = 2  # Pad the domain if input is non-periodic
+        self.convs = SpectralConv1d(self.width, self.width, self.modes1)
+        self.ws = nn.Conv1d(self.width, self.width, 1)
+        
+    def forward(self, x):
+        """
+        Forward pass of FourierLayer.
+        Args:
+            x (Tensor): Input tensor of shape (batch, width, length).
+        Returns:
+            Tensor: Output tensor of shape (batch, width, length).
+        """
+        x1 = self.convs(x)
+        x2 = self.ws(x)
+        x = x1 + x2
+        x = F.gelu(x)
+        return x
+
+class MSFNO(nn.Module):
+    def __init__(self, in_channels, mode_length, embed_dim, fno_modes, fno_layers, out_channels):
+        """
+        Modal-stiffness Fourier Neural Operator (MS-FNO).
+        Args:
+            in_channels (int): Number of input tokens.
+            mode_length (int): Length of modal input (including positional encoding); also target dimension after frequency lifting.
+            embed_dim (int): Embedding dimension.
+            fno_modes (int): Number of Fourier modes in FNO layers.
+            fno_layers (int): Number of FNO layers.
+            out_channels (int): Output dimension.
+        """
+        super(MSFNO, self).__init__()
+        self.lifting = nn.Linear(in_channels, embed_dim)
+        self.fno_layers = nn.ModuleList([
+            FourierLayer(fno_modes, embed_dim) for _ in range(fno_layers)
+        ])
+        self.projection1 = nn.Linear(embed_dim, embed_dim // 2)
+        self.projection2 = nn.Linear(embed_dim // 2, out_channels)
+
+    def forward(self, x):
+        """
+        Forward pass of MSFNO.
+        Args:
+            x (Tensor): Input tensor of shape (batch, in_channels, mode_length).
+        Returns:
+            Tensor: Output tensor of shape (batch, mode_length, out_channels).
+        """
+        x = self.lifting(x.transpose(1, 2)).transpose(1, 2)  # (batch, embed_dim, mode_length)
         for layer in self.fno_layers:
             x = F.gelu(layer(x))
-        # 转置回 (batch, mode_length, embed_dim)
-        x = x.transpose(1,2)
+        x = x.transpose(1, 2)
         x = self.projection1(x)
-        out = self.projection2(x)  # (batch, mode_length, out_channels)
+        out = self.projection2(x)
         return out
-

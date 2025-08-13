@@ -2,12 +2,11 @@
 Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
 Date: 2025-08-12 18:06:32
 LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
-LastEditTime: 2025-08-13 17:14:12
+LastEditTime: 2025-08-13 21:30:05
 FilePath: \MS-FNO&MoSRNet_clean\models\Baselines.py
 '''
 
 
-import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -91,3 +90,29 @@ class ResNet(nn.Module):
         for _ in range(1, blocks):
             layers.append(BasicBlock1D(out_ch, out_ch, stride=1))
         return nn.Sequential(*layers)
+
+    def forward(self, x):
+        """
+        输入:
+          mode_shapes: (batch, in_channels, mode_length)
+          frequencies: (batch, in_channels, freq_length)
+        输出:
+          out: (batch, mode_length, out_channels)
+        """
+        # Embedding & 初步处理
+        x = F.gelu(self.mode_embed(x.transpose(1, 2))).transpose(1, 2)
+
+        # 初始大卷积
+        x = self.initial_conv(x)
+        # ResNet18-1D 风格特征提取
+        x = self.resnet_layers(x)
+
+        # 准备 LayerNorm，shape 转为 (batch, mode_length, embed_dim)
+        x = x.transpose(1, 2)
+        x = self.norm1(x)
+
+        # 输出预测
+        x = self.projection1(x)
+        out = self.projection2(x)
+        return out
+

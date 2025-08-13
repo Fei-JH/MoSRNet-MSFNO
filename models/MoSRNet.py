@@ -2,7 +2,7 @@
 Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
 Date: 2025-08-12 18:06:32
 LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
-LastEditTime: 2025-08-13 17:26:25
+LastEditTime: 2025-08-13 20:22:40
 FilePath: \MS-FNO&MoSRNet_clean\models\MoSRNet.py
 '''
 
@@ -28,7 +28,8 @@ class Subnetwork(nn.Module):
             nn.GELU(),
             nn.BatchNorm1d(self.dim2),
             nn.Flatten(),
-            nn.Linear(self.dim2 * self.inlen, self.outlen)  
+            nn.Linear(self.dim2 * self.inlen, self.outlen)  # 调整线性层的输入大小
+        )
 
     def forward(self, x):
         x = self.layers(x)

@@ -1,9 +1,11 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Jun 21 17:23:41 2024 (JST)
+'''
+Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
+Date: 2025-08-12 18:06:32
+LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
+LastEditTime: 2025-08-13 18:49:09
+'''
 
-@author: Jinghao FEI
-"""
+
 import torch
 import operator
 from functools import reduce

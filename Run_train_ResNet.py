@@ -1,33 +1,31 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Feb 14 17:51:30 2025 (JST)
+'''
+Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
+Date: 2025-08-13 15:14:27
+LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
+LastEditTime: 2025-08-13 21:28:33
+'''
 
-@author: Jinghao FEI
-"""
-# Standard library imports
+
 import copy
 import os
 import platform
 import psutil
 
-# Third-party library imports
 import torch
 import yaml
 from torch.utils.data import DataLoader, TensorDataset
 from pathlib import Path
-# Attempting to import wandb (optional dependency)
+
 try:
     import wandb
     wandb_loaded = True
 except ImportError:
     wandb_loaded = False
 
-# Custom module imports
-from models.MSFNO import MSFNO
-from models.Baselines import ResNet
+from models.resnet import ResNet
 from utilities.muon  import SingleDeviceMuonWithAuxAdam
-from experiments.train_MSFNO import train_1d
-from experiments.scheduler import ExpLRScheduler
+from experiments.train_msfno_and_resnet import train_1d
+from utilities.scheduler import ExpLRScheduler
 from utilities import utilkit as kit
 
 #%%
@@ -117,13 +115,13 @@ def run_train_1d(config, config_name, device, model_class, use_wandb=False, swee
     # scheduler = SinExpLRScheduler(optimizer, warmup_epochs=20, decay_rate=0.96, initial_ratio=0, sin_amplitude=0.1, sin_frequency=0.1)
     
     results_path = config["paths"]["results_path"]
+    os.makedirs(results_path, exist_ok=True)
     config_intask = copy.deepcopy(config)
     if "status" in config_intask:
         del config_intask["status"]
     config_intask["system_info"] = system_info
     config_intask["model"]["total_params"] = total_params
     file_path = os.path.join(results_path, config_name)
-    file_path = kit.safe_path(file_path)
     with open(file_path, 'w', encoding='utf-8') as f:
         yaml.dump(config_intask, f, default_flow_style=False, allow_unicode=True)
     del file_path
@@ -142,22 +140,18 @@ def run_train_1d(config, config_name, device, model_class, use_wandb=False, swee
                      wandb_loaded=wandb_loaded,
                      use_wandb=use_wandb,
                      use_tqdm=True,
-                     use_UW=False,
                      calc_stats=True)
 
     return trained_model
 
 
 #%%
-model_classes = {
-                "MSFNO":MSFNO,
-                "ResNet":ResNet,
-                }
+model_classes = {"resnet":ResNet}
 
 # config_name = "EXP1-MSFNO-BeamDI01_T8000-DD-250620-174154.yaml"
 
 directory = "./configs" 
-yaml_files = [f for f in os.listdir(directory) if f.endswith(('.yaml', '.yml'))]
+yaml_files = [f for f in os.listdir(directory) if f.endswith(('.yaml', '.yml')) and f.startswith('resnet')]
 
 for config_name in yaml_files:
     with open(f"./configs/{config_name}", "r") as f:
@@ -165,4 +159,4 @@ for config_name in yaml_files:
         
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  
 
-    trained_model = run_train_1d(config, config_name, device, model_classes[config["model"]["model"]], use_wandb=True, sweep=False)
+    trained_model = run_train_1d(config, config_name, device, model_classes[config["model"]["model"]], use_wandb=False, sweep=False)

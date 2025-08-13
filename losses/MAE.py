@@ -1,9 +1,10 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Nov 10 12:40:58 2024
+'''
+Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
+Date: 2025-08-12 18:06:32
+LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
+LastEditTime: 2025-08-13 18:42:26
+'''
 
-@author: pluto
-"""
 
 import torch
 

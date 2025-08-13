@@ -1,8 +1,8 @@
 '''
 Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
-Date: 2025-08-12 18:06:11
+Date: 2025-08-13 15:13:23
 LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
-LastEditTime: 2025-08-13 18:09:21
+LastEditTime: 2025-08-13 19:49:20
 '''
 
 
@@ -11,15 +11,15 @@ from datetime import datetime
 from utilities.config_util import check_config_file
 from utilities.config_util import save_config_to_yaml
 
-#%%
+#%% 
 """ Input all the parameters in this block"""
 
 description = "SHM Framework of MoSRNet and MS-FNO"
-model = "MSFNO"
+model = "resnet"
 # Data parameters
-data = "BeamDI_NUM"
-subset = "BeamDI_NUM_T8000"
-validset = "BeamDI_NUM_V1000"
+data = "beamdi_num"
+subset = "beamdi_num_t8000"
+validset = "beamdi_num_v1000"
 
 if not subset:
     subset = data    
@@ -57,10 +57,7 @@ model = {
         "model":model,
         "para":{
         "in_channels":in_chan+1,
-        "mode_length": 541,
         "embed_dim":128,
-        "fno_modes":16,
-        "fno_layers":3,
         "out_channels":out_chan,
         }
         }
@@ -109,7 +106,6 @@ config = {
 
 #%%
 
-# Case name
 current_time = datetime.now()
 gentime = current_time.strftime('%y%m%d-%H%M%S')
 

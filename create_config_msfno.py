@@ -2,7 +2,7 @@
 Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
 Date: 2025-08-12 18:06:11
 LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
-LastEditTime: 2025-08-13 18:28:12
+LastEditTime: 2025-08-13 19:49:06
 '''
 
 
@@ -14,57 +14,56 @@ from utilities.config_util import save_config_to_yaml
 #%%
 """ Input all the parameters in this block"""
 
-description = "SHM Framework of MoSRNet and MS-FNO "
-model = "MoSRNet"
+description = "SHM Framework of MoSRNet and MS-FNO"
+model = "msfno"
 # Data parameters
-data = "BeamDI_NUM"
-subset = "BeamDI_NUM_T8000"
-validset = "BeamDI_NUM_V1000"
+data = "beamdi_num"
+subset = "beamdi_num_t8000"
+validset = "beamdi_num_v1000"
 
 if not subset:
     subset = data    
     
-# Training parameters
-epochs = 150
-batch_size = 16 
-in_chan = 3 
-
-learning_rate = 0.001
-weight_decay = 0.01
-
-# Downsample indices
-down_idx = [0, 68, 135, 203, 270, 337, 405, 473, 540] 
-gt_idx = 540
-
 # Loss parameters
 losses = [
-            ["LpLoss",1,[1,1,0,0,1,1,0,0], {"d":2, "p":2, "size_average":True, "reduction":True}],
+            ["LpLoss",1,[1,1,0,0,1,1,0,0], {"d":2, "p":2, "size_average":True, "reduction":True}]
          ]
 
 evaluations = [
                 ["R2",[1,1,0,0,1,1,0,0], {"reduction":"mean", "epsilon":1e-8}],
-                ["MAE",[1,1,0,0,1,1,0,0], {"reduction":"mean"}],
+                ["MAE",[1,1,0,0,1,1,0,0], {"reduction":"mean"}]
               ]
 #(compute_std, compute_cv, compute_skewness, compute_kurtosis,compute_min, compute_max, compute_median, compute_variance)
 #eg. ["R2",[1,1,0,0,1,1,0,0]] means compute R2 with compute_std, compute_cv, compute_min, compute_max
+
+# Training parameters
+epochs = 150
+batch_size = 16
+in_chan = 3  
+out_chan = 1  
+
+learning_rate = 0.001
+weight_decay = 0.01
 
 scheduler = {
             "scheduler"    :"ExpLRScheduler",
             "warmup_epochs": 20,
             "decay_rate"   : 0.9798,
-            "initial_ratio": 0.00001
+            "initial_ratio": 0
             }
-    
+
+# Model parameters
 model = {
         "model":model,
-        "para":
-        {"dim1":16,
-        "dim2fct":2,
-        "inlen":len(down_idx),
-        "outlen":gt_idx,
-        "num_subnets":3
+        "para":{
+        "in_channels":in_chan+1,
+        "mode_length": 541,
+        "embed_dim":128,
+        "fno_modes":16,
+        "fno_layers":3,
+        "out_channels":out_chan,
         }
-        }    
+        }
 
 randomseed=114514
 
@@ -92,11 +91,10 @@ config = {
     "train": {
         "epochs": epochs,
         "batch_size": batch_size,
-        "learning_rate": learning_rate,
-        "weight_decay": weight_decay,
         "in_channels": in_chan,
-        "down_idx": down_idx,
-        "gt_idx": gt_idx, 
+        "out_channels": out_chan,
+        "learning_rate": learning_rate,
+        "weight_decay": weight_decay
     },
 
     # Scheduler parameters
@@ -126,7 +124,7 @@ else:
     config["project"]["project"] = project_name
     config["project"]["case"] = case_name[:-5]
     
-    results_dir = os.path.join("./results", project_name)
+    results_dir = os.path.join(r"./results", project_name)
     results_path = os.path.join(results_dir, case_name[:-5])
     config_path = os.path.join(config_dir, case_name)
     

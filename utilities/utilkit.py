@@ -513,6 +513,7 @@ def load_loss_function(module_path: str):
     try:
         # Extract module name and function/class name
         *module_parts, function_name = module_path.split('.')
+        module_parts[1] = module_parts[1].lower()
         module_name = ".".join(module_parts)
 
         # Dynamically import the module
