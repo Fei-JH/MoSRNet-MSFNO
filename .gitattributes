@@ -1,0 +1,122 @@
+# =========================
+# Core: Normalize line endings
+# =========================
+# Use LF for all text files across platforms
+* text=auto eol=lf
+
+# =========================
+# Code & Scripts (text)
+# =========================
+*.py    text
+*.ipynb text
+*.md    text
+*.rst   text
+*.txt   text
+*.json  text
+*.yaml  text
+*.yml   text
+*.toml  text
+*.ini   text
+*.cfg   text
+*.csv   text
+*.tsv   text
+
+# Shell / Make / Batch / PowerShell
+*.sh    text eol=lf
+*.bash  text eol=lf
+Makefile text eol=lf
+*.mk    text eol=lf
+*.bat   text
+*.cmd   text
+*.ps1   text
+
+# Web / Docs text
+*.html  text
+*.css   text
+*.js    text
+*.tex   text
+*.bib   text
+*.cls   text
+*.sty   text
+
+# =========================
+# Binary assets (no EOL conversion)
+# =========================
+# Images
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.svg   text         # SVG is XML; keep as text for diff
+*.pdf   binary
+
+# Presentations / Office
+*.ppt   binary
+*.pptx  binary
+*.key   binary
+*.doc   binary
+*.docx  binary
+*.xls   binary
+*.xlsx  binary
+
+# Archives / Packages
+*.zip   binary
+*.tar   binary
+*.gz    binary
+*.bz2   binary
+*.xz    binary
+*.7z    binary
+*.rar   binary
+*.whl   binary
+
+# Models / Checkpoints / Weights
+*.pt    binary
+*.pth   binary
+*.h5    binary
+*.onnx  binary
+*.ckpt  binary
+*.npz   binary
+*.npy   binary
+*.pkl   binary
+*.joblib binary
+
+# Data blobs (treat as binary to avoid EOL changes)
+*.mat   binary
+*.hdf5  binary
+*.parquet binary
+*.feather binary
+*.sav   binary
+
+# CAD / FEM outputs (examples)
+*.inp   text
+*.odb   binary
+*.rpt   text
+*.dat   text
+*.msh   text
+*.vtk   text
+*.vtu   text
+*.stl   binary
+
+# =========================
+# Jupyter & metadata tuning
+# =========================
+# Keep notebooks as text to allow diff tools; consider using nbstripout separately
+*.ipynb text
+
+# =========================
+# GitHub linguist (optional cosmetics)
+# =========================
+# Mark data and outputs as not counted in language stats
+data/**        linguist-vendored
+datasets/**    linguist-vendored
+outputs/**     linguist-vendored
+checkpoints/** linguist-vendored
+logs/**        linguist-vendored
+
+# =========================
+# OS-specific
+# =========================
+# Ensure .gitattributes and .gitignore stay LF
+.gitattributes text eol=lf
+.gitignore     text eol=lf

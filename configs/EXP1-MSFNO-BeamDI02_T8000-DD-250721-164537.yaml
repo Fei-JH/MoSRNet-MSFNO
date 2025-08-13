@@ -1,0 +1,83 @@
+data:
+  data: BeamDI02
+  subset: BeamDI02_T8000
+  validset: BeamDI02_V1000
+loss:
+  evaluations:
+  - - R2
+    - - 1
+      - 1
+      - 0
+      - 0
+      - 1
+      - 1
+      - 0
+      - 0
+    - epsilon: 1.0e-08
+      reduction: mean
+  - - MAE
+    - - 1
+      - 1
+      - 0
+      - 0
+      - 1
+      - 1
+      - 0
+      - 0
+    - reduction: mean
+  losses:
+  - - LpLoss
+    - 1
+    - - 1
+      - 1
+      - 0
+      - 0
+      - 1
+      - 1
+      - 0
+      - 0
+    - d: 2
+      p: 2
+      reduction: true
+      size_average: true
+model:
+  model: MSFNO
+  para:
+    embed_dim: 128
+    fno_layers: 3
+    fno_modes: 16
+    in_channels: 4
+    mode_length: 541
+    out_channels: 1
+paths:
+  config_path: ./configs\EXP1-MSFNO-BeamDI02_T8000-DD-250721-164537.yaml
+  results_path: ./results\MSFNO-BeamDI02\EXP1-MSFNO-BeamDI02_T8000-DD-250721-164537
+project:
+  case: EXP1-MSFNO-BeamDI02_T8000-DD-250721-164537
+  description: BeamDI02_V1000
+  project: MSFNO-BeamDI02
+  tasktype: DD
+randomseed: 114514
+scheduler:
+  decay_rate: 0.9798
+  initial_ratio: 0
+  scheduler: ExpLRScheduler
+  warmup_epochs: 20
+status:
+  train_count: 4
+  train_history:
+  - end_time: null
+    start_time: '2025-07-21 16:46:16'
+  - end_time: null
+    start_time: '2025-07-21 16:58:01'
+  - end_time: null
+    start_time: '2025-07-21 17:04:33'
+  - end_time: '2025-07-21 17:26:05'
+    start_time: '2025-07-21 17:07:58'
+train:
+  batch_size: 16
+  epochs: 150
+  in_channels: 3
+  learning_rate: 0.001
+  out_channels: 1
+  weight_decay: 0.01
