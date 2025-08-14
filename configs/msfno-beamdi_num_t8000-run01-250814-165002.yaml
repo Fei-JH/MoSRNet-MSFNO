@@ -53,40 +53,31 @@ loss:
       reduction: true
       size_average: true
 model:
-  model: mosrnet
+  model: msfno
   para:
-    dim1: 16
-    dim2fct: 2
-    inlen: 9
-    num_subnets: 3
-    outlen: 540
+    embed_dim: 128
+    fno_layers: 3
+    fno_modes: 16
+    in_channels: 4
+    mode_length: 541
+    out_channels: 1
 paths:
-  config_path: ./configs\mosrnet-beamdi_num_t8000-run01-250814-145701.yaml
-  results_path: ./results\mosrnet-beamdi_num\mosrnet-beamdi_num_t8000-run01-250814-145701
+  config_path: ./configs\msfno-beamdi_num_t8000-run01-250814-165002.yaml
+  results_path: ./results\msfno-beamdi_num\msfno-beamdi_num_t8000-run01-250814-165002
 project:
-  case: mosrnet-beamdi_num_t8000-run01-250814-145701
-  description: 'SHM Framework of MoSRNet and MS-FNO '
-  project: mosrnet-beamdi_num
+  case: msfno-beamdi_num_t8000-run01-250814-165002
+  description: SHM Framework of MoSRNet and MS-FNO
+  project: msfno-beamdi_num
 randomseed: 114514
 scheduler:
-  decay_rate: 0.97
-  initial_ratio: 1.0e-05
+  decay_rate: 0.975
+  initial_ratio: 0
   scheduler: ExpLRScheduler
   warmup_epochs: 20
 train:
   batch_size: 16
-  down_idx:
-  - 0
-  - 68
-  - 135
-  - 203
-  - 270
-  - 337
-  - 405
-  - 473
-  - 540
-  epochs: 120
-  gt_idx: 540
+  epochs: 170
   in_channels: 3
   learning_rate: 0.001
+  out_channels: 1
   weight_decay: 0.01

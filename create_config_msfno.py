@@ -2,7 +2,7 @@
 Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
 Date: 2025-08-12 18:06:11
 LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
-LastEditTime: 2025-08-14 14:24:42
+LastEditTime: 2025-08-14 16:11:32
 '''
 
 
@@ -30,14 +30,15 @@ losses = [
          ]
 
 evaluations = [
-                ["R2",[1,1,0,0,1,1,0,0], {"reduction":"mean", "epsilon":1e-8}],
-                ["MAE",[1,1,0,0,1,1,0,0], {"reduction":"mean"}]
+                ["R2",[1,1,0,0,1,1,0,0], {"size_average":True, "reduction":True}],
+                ["MAE",[1,1,0,0,1,1,0,0], {"size_average":True, "reduction":True}],
+                ["MAPE",[1,1,0,0,1,1,0,0], {"size_average":True, "reduction":True}]
               ]
 #(compute_std, compute_cv, compute_skewness, compute_kurtosis,compute_min, compute_max, compute_median, compute_variance)
 #eg. ["R2",[1,1,0,0,1,1,0,0]] means compute R2 with compute_std, compute_cv, compute_min, compute_max
 
 # Training parameters
-epochs = 120
+epochs = 170
 batch_size = 16
 in_chan = 3  
 out_chan = 1  
@@ -48,7 +49,7 @@ weight_decay = 0.01
 scheduler = {
             "scheduler"    :"ExpLRScheduler",
             "warmup_epochs": 20,
-            "decay_rate"   : 0.97,
+            "decay_rate"   : 0.975,
             "initial_ratio": 0
             }
 

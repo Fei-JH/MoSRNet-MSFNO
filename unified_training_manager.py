@@ -2,7 +2,7 @@
 Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
 Date: 2025-08-14 12:00:18
 LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
-LastEditTime: 2025-08-14 14:36:14
+LastEditTime: 2025-08-14 16:36:49
 '''
 
 
@@ -319,49 +319,32 @@ def build_arg_parser() -> argparse.ArgumentParser:
     return p
 
 # ----------------------------------- main ----------------------------------- #
+
 def main() -> None:
     print_divider("=")
     print_wrapped("Unified Training Manager")
     print_divider("=")
 
-    # Parse CLI args
-    parser = build_arg_parser()
-    args = parser.parse_args()
+    start_time_total = time.time()  # <<< 记录总计用时开始
 
-    # Select scripts (CLI or interactive)
-    if args.scripts is not None:
-        try:
-            selected_scripts = parse_scripts_arg(args.scripts)
-        except Exception as e:
-            print_wrapped(f"Invalid --scripts: {e}")
-            sys.exit(1)
-    else:
-        selected_scripts = select_scripts_interactive()
+    # 1) Select scripts
+    selected_script_idxs = select_scripts()  # 1-based indices
 
-    # wandb selection (CLI or interactive)
-    if args.wandb is not None:
-        use_wandb_flag = bool(args.wandb)
-    else:
-        use_wandb_flag = detect_and_pick_wandb_interactive()
+    # 2) Detect & choose wandb usage
+    use_wandb_flag = detect_and_pick_wandb()
 
-    # Build config selection map
-    configs_map: Dict[str, str] = {}
-    if args.mosrnet_configs: configs_map["mosrnet"] = args.mosrnet_configs
-    if args.msfno_configs:   configs_map["msfno"]   = args.msfno_configs
-    if args.resnet_configs:  configs_map["resnet"]  = args.resnet_configs
-
-    # Build all tasks upfront
-    tasks = build_tasks(
-        selected_scripts=selected_scripts,
-        configs_map=configs_map if configs_map else None,
-        configs_all=args.configs_all,
-    )
+    # 3) Build ALL tasks upfront (script × selected configs)
+    tasks = build_tasks_upfront(selected_script_idxs)
     if not tasks:
         print_wrapped("No tasks to run. Exiting.")
         return
 
-    # Execute
+    # 4) Run tasks sequentially with 4-line header for each task
     run_tasks(tasks, use_wandb_flag)
+
+    total_elapsed = time.time() - start_time_total  # <<< 总计用时
+    print_divider("=")
+    print_wrapped(f"All tasks finished. Total elapsed: {total_elapsed:.1f} s")
 
 if __name__ == "__main__":
     main()

@@ -2,7 +2,7 @@
 Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
 Date: 2025-08-12 18:06:31
 LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
-LastEditTime: 2025-08-13 20:57:10
+LastEditTime: 2025-08-14 16:47:07
 '''
 
 
@@ -16,7 +16,7 @@ import numpy as np
 from datetime import datetime
 from utilities import utilkit as kit
 from utilities.config_util import update_training_status
-from utilities.train_util import compute_dataset_stats_mosrnet
+from utilities.train_util import compute_dataset_stats
 
 
 #%%
@@ -33,7 +33,7 @@ def train_1d(config,
              ckpt=True,
              wandb_loaded=False,
              use_wandb=False,
-             use_tqdm=False,
+             use_tqdm=True,
              calc_stats=True):
     
     update_training_status(config, phase="start")
@@ -98,12 +98,12 @@ def train_1d(config,
         
         for loss in loss_names:
             new_loss = kit.load_loss_function(f"losses.{loss}.{loss}")
-            loaded_loss = new_loss(size_average=False)
+            loaded_loss = new_loss(size_average=False, reduction=False)
             sample_losses.append(loaded_loss)
             
         for evaluation in evaluations:
             new_evaluation = kit.load_loss_function(f"losses.{evaluation}.{evaluation}")
-            loaded_evaluation = new_evaluation(size_average=False)
+            loaded_evaluation = new_evaluation(size_average=False, reduction=False)
             sample_evaluations.append(loaded_evaluation)
 
     for ep in epochs:
@@ -237,8 +237,8 @@ def train_1d(config,
                 
         if calc_stats:
             for idx, sample_loss in enumerate(sample_losses):
-                train_stats = compute_dataset_stats_mosrnet(model, train_loader.dataset, 500, device, sample_loss, loss_stats_flags[idx])
-                valid_stats = compute_dataset_stats_mosrnet(model, valid_loader.dataset, 100, device, sample_loss, loss_stats_flags[idx])
+                train_stats = compute_dataset_stats(model, train_loader.dataset, 500, device, sample_loss, loss_stats_flags[idx])
+                valid_stats = compute_dataset_stats(model, valid_loader.dataset, 100, device, sample_loss, loss_stats_flags[idx])
                 if train_stats is not None:
                     for stat_key, stat_value in train_stats.items():
                         # If key does not exist or is not a list, initialize it
@@ -252,8 +252,8 @@ def train_1d(config,
                         history[f"Vloss_{loss_names[idx]}"][stat_key].append(stat_value)
             
             for idx, sample_evaluation in enumerate(sample_evaluations):
-                train_stats = compute_dataset_stats_mosrnet(model, train_loader.dataset, 500, device, sample_evaluation, evaluation_stats_flags[idx])
-                valid_stats = compute_dataset_stats_mosrnet(model, valid_loader.dataset, 100, device, sample_evaluation, evaluation_stats_flags[idx])
+                train_stats = compute_dataset_stats(model, train_loader.dataset, 500, device, sample_evaluation, evaluation_stats_flags[idx])
+                valid_stats = compute_dataset_stats(model, valid_loader.dataset, 100, device, sample_evaluation, evaluation_stats_flags[idx])
                 if train_stats is not None:
                     for stat_key, stat_value in train_stats.items():
                         if stat_key not in history[f"Teval_{evaluations[idx]}"]:

@@ -2,7 +2,7 @@
 Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
 Date: 2025-08-12 18:06:31
 LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
-LastEditTime: 2025-08-13 21:00:14
+LastEditTime: 2025-08-14 16:49:46
 '''
 
 
@@ -96,11 +96,11 @@ def train_1d(config,
         sample_evaluations = []
         for loss in loss_names:
             new_loss = kit.load_loss_function(f"losses.{loss}.{loss}")
-            loaded_loss = new_loss(size_average=False)
+            loaded_loss = new_loss(size_average=False, reduction=False)
             sample_losses.append(loaded_loss)
         for evaluation in evaluations:
             new_evaluation = kit.load_loss_function(f"losses.{evaluation}.{evaluation}")
-            loaded_evaluation = new_evaluation(size_average=False)
+            loaded_evaluation = new_evaluation(size_average=False, reduction=False)
             sample_evaluations.append(loaded_evaluation)
 
     starttime = time.time()

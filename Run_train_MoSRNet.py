@@ -2,7 +2,7 @@
 Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
 Date: 2025-08-13 15:14:27
 LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
-LastEditTime: 2025-08-14 12:34:34
+LastEditTime: 2025-08-14 16:47:14
 '''
 
 
@@ -139,7 +139,7 @@ def run_train_1d(config, config_name, device, model_class, use_wandb=False, swee
                      wandb_loaded=wandb_loaded,
                      use_wandb=use_wandb,
                      use_tqdm=True,
-                     calc_stats=False)
+                     calc_stats=True)
 
     return trained_model
 
@@ -167,7 +167,8 @@ if __name__ == "__main__":
             config_name,
             device,
             model_classes[config["model"]["model"]],
-            use_wandb=False,
+            use_wandb=True,
             sweep=False
+
         )
 
