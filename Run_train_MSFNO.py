@@ -2,19 +2,16 @@
 Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
 Date: 2025-08-13 15:14:27
 LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
-LastEditTime: 2025-08-13 21:23:53
+LastEditTime: 2025-08-14 13:41:21
 '''
 
 
 import copy
 import os
-import platform
-import psutil
 
 import torch
 import yaml
 from torch.utils.data import DataLoader, TensorDataset
-from pathlib import Path
 
 try:
     import wandb
@@ -34,22 +31,7 @@ def run_train_1d(config, config_name, device, model_class, use_wandb=False, swee
     randomseed = config["randomseed"]
     kit.set_seed(randomseed)
     
-    # 系统信息打印
-    system_info = {
-        'platform': platform.system(),
-        'platform_release': platform.release(),
-        'platform_version': platform.version(),
-        'architecture': platform.machine(),
-        'cpu': platform.processor(),
-        'ram': f"{round(psutil.virtual_memory().total / (1024.0 **3))} GB"
-    }
-    if torch.cuda.is_available():
-        system_info['gpu'] = torch.cuda.get_device_name(0)
-        system_info['gpu_count'] = torch.cuda.device_count()
-    print("### System and Hardware Specifications ###")
-    for k, v in system_info.items():
-        print(f"{k}: {v}")
-    print("########################################")
+    system_info = kit.get_system_info()
     
     # Wandb初始化（如果使用）
     try:
@@ -150,13 +132,25 @@ model_classes = {"msfno":MSFNO}
 
 # config_name = "EXP1-MSFNO-BeamDI01_T8000-DD-250620-174154.yaml"
 
-directory = "./configs" 
-yaml_files = [f for f in os.listdir(directory) if f.endswith(('.yaml', '.yml')) and f.startswith('msfno')]
+if __name__ == "__main__":
+    directory = "./configs"
+    yaml_files = [
+        f for f in os.listdir(directory)
+        if f.endswith(('.yaml', '.yml')) and f.startswith('msfno')
+    ]
 
-for config_name in yaml_files:
-    with open(f"./configs/{config_name}", "r") as f:
-        config = yaml.load(f, Loader=yaml.SafeLoader)
-        
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  
+    for config_name in yaml_files:
+        with open(f"./configs/{config_name}", "r") as f:
+            config = yaml.load(f, Loader=yaml.SafeLoader)
 
-    trained_model = run_train_1d(config, config_name, device, model_classes[config["model"]["model"]], use_wandb=False, sweep=False)
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+        trained_model = run_train_1d(
+            config,
+            config_name,
+            device,
+            model_classes[config["model"]["model"]],
+            use_wandb=False,
+            sweep=False
+        )
+

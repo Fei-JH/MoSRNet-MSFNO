@@ -15,7 +15,7 @@ def zeropower_via_newtonschulz5(G, steps: int):
     assert G.ndim >= 2 # batched Muon implementation by @scottjmaddox, and put into practice in the record by @YouJiacheng
     a, b, c = (3.4445, -4.7750,  2.0315)
     # X = G.bfloat16()
-    X = G.float()
+    X = G.real.float() #Modified by Fei-JH from X = G.float() 20250814
     if G.size(-2) > G.size(-1):
         X = X.mT
 

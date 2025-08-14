@@ -9,6 +9,8 @@ import numpy as np
 import pandas as pd
 import shutil
 import importlib
+import sys
+import socket
 
 from scipy.interpolate import CubicSpline
 from scipy.interpolate import interp1d
@@ -21,6 +23,7 @@ from datetime import datetime
 
 import torch
 import random
+
 
 def create_folder_batches(workdir, foldername):
     """
@@ -799,3 +802,57 @@ def print_epoch_results(
     print(eval_sep)
     print("-" * 80)
     print()
+
+
+
+def get_system_info(print_info=True):
+    """Get system and hardware specifications.
+
+    Args:
+        print_info (bool): Whether to print info to console.
+    Returns:
+        dict: System information dictionary.
+    """
+    # Collect system information
+    system_info = {
+        "Device Name": socket.gethostname(),
+        "Platform": platform.system(),
+        "Release": platform.release(),
+        "Version": platform.version(),
+        "Architecture": platform.machine(),
+        "CPU": platform.processor(),
+        "CPU Cores (Logical)": psutil.cpu_count(logical=True),
+        "CPU Cores (Physical)": psutil.cpu_count(logical=False),
+        "RAM Total": f"{round(psutil.virtual_memory().total / (1024.0 ** 3))} GB",
+        "RAM Available": f"{round(psutil.virtual_memory().available / (1024.0 ** 3))} GB",
+        "Python Version": sys.version.split()[0]
+    }
+
+    # Disk info
+    disk_total, _, disk_free = shutil.disk_usage("/")
+    system_info["Disk Total"] = f"{disk_total // (1024**3)} GB"
+    system_info["Disk Free"] = f"{disk_free // (1024**3)} GB"
+
+    # Torch and CUDA info
+    system_info["PyTorch Version"] = torch.__version__
+    if torch.cuda.is_available():
+        system_info["GPU"] = torch.cuda.get_device_name(0)
+        system_info["GPU Count"] = torch.cuda.device_count()
+        system_info["CUDA Version"] = torch.version.cuda
+    else:
+        system_info["GPU"] = "None"
+        system_info["GPU Count"] = 0
+        system_info["CUDA Version"] = "N/A"
+
+    # Print if required
+    if print_info:
+        line_width = 80
+        print("=" * line_width)
+        title = " System and Hardware Specifications "
+        print(title.center(line_width, "="))
+        print("-" * line_width)
+        for k, v in system_info.items():
+            print(f"{k:<22}: {v}")
+        print("=" * line_width)
+
+    return system_info

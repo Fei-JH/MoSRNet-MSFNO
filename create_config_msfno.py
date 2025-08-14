@@ -2,7 +2,7 @@
 Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
 Date: 2025-08-12 18:06:11
 LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
-LastEditTime: 2025-08-13 19:49:06
+LastEditTime: 2025-08-14 14:24:42
 '''
 
 
@@ -37,7 +37,7 @@ evaluations = [
 #eg. ["R2",[1,1,0,0,1,1,0,0]] means compute R2 with compute_std, compute_cv, compute_min, compute_max
 
 # Training parameters
-epochs = 150
+epochs = 120
 batch_size = 16
 in_chan = 3  
 out_chan = 1  
@@ -48,7 +48,7 @@ weight_decay = 0.01
 scheduler = {
             "scheduler"    :"ExpLRScheduler",
             "warmup_epochs": 20,
-            "decay_rate"   : 0.9798,
+            "decay_rate"   : 0.97,
             "initial_ratio": 0
             }
 

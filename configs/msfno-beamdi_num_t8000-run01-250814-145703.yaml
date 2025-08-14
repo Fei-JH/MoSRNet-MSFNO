@@ -50,46 +50,21 @@ model:
     mode_length: 541
     out_channels: 1
 paths:
-  config_path: ./configs\msfno-beamdi_num_t8000-run01-250813-194908.yaml
-  results_path: ./results\msfno-beamdi_num\msfno-beamdi_num_t8000-run01-250813-194908
+  config_path: ./configs\msfno-beamdi_num_t8000-run01-250814-145703.yaml
+  results_path: ./results\msfno-beamdi_num\msfno-beamdi_num_t8000-run01-250814-145703
 project:
-  case: msfno-beamdi_num_t8000-run01-250813-194908
+  case: msfno-beamdi_num_t8000-run01-250814-145703
   description: SHM Framework of MoSRNet and MS-FNO
   project: msfno-beamdi_num
 randomseed: 114514
 scheduler:
-  decay_rate: 0.9798
+  decay_rate: 0.97
   initial_ratio: 0
   scheduler: ExpLRScheduler
   warmup_epochs: 20
-status:
-  train_count: 11
-  train_history:
-  - end_time: null
-    start_time: '2025-08-13 21:03:24'
-  - end_time: null
-    start_time: '2025-08-13 21:06:17'
-  - end_time: null
-    start_time: '2025-08-13 21:07:40'
-  - end_time: null
-    start_time: '2025-08-13 21:09:10'
-  - end_time: null
-    start_time: '2025-08-13 21:10:41'
-  - end_time: null
-    start_time: '2025-08-13 21:13:05'
-  - end_time: null
-    start_time: '2025-08-13 21:14:15'
-  - end_time: null
-    start_time: '2025-08-13 21:15:51'
-  - end_time: '2025-08-13 21:19:19'
-    start_time: '2025-08-13 21:18:58'
-  - end_time: '2025-08-13 21:24:22'
-    start_time: '2025-08-13 21:24:01'
-  - end_time: '2025-08-13 21:25:03'
-    start_time: '2025-08-13 21:24:42'
 train:
   batch_size: 16
-  epochs: 2
+  epochs: 120
   in_channels: 3
   learning_rate: 0.001
   out_channels: 1

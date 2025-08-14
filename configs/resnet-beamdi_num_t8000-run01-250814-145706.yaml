@@ -47,28 +47,21 @@ model:
     in_channels: 4
     out_channels: 1
 paths:
-  config_path: ./configs\resnet-beamdi_num_t8000-run01-250813-194922.yaml
-  results_path: ./results\resnet-beamdi_num\resnet-beamdi_num_t8000-run01-250813-194922
+  config_path: ./configs\resnet-beamdi_num_t8000-run01-250814-145706.yaml
+  results_path: ./results\resnet-beamdi_num\resnet-beamdi_num_t8000-run01-250814-145706
 project:
-  case: resnet-beamdi_num_t8000-run01-250813-194922
+  case: resnet-beamdi_num_t8000-run01-250814-145706
   description: SHM Framework of MoSRNet and MS-FNO
   project: resnet-beamdi_num
 randomseed: 114514
 scheduler:
-  decay_rate: 0.9798
+  decay_rate: 0.97
   initial_ratio: 0
   scheduler: ExpLRScheduler
   warmup_epochs: 20
-status:
-  train_count: 2
-  train_history:
-  - end_time: null
-    start_time: '2025-08-13 21:28:43'
-  - end_time: '2025-08-13 21:31:13'
-    start_time: '2025-08-13 21:30:22'
 train:
   batch_size: 16
-  epochs: 2
+  epochs: 120
   in_channels: 3
   learning_rate: 0.001
   out_channels: 1
