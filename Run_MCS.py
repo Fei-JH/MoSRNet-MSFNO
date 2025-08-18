@@ -1,3 +1,11 @@
+'''
+Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
+Date: 2025-08-12 18:06:19
+LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
+LastEditTime: 2025-08-18 19:22:44
+'''
+
+
 import os
 import numpy as np
 import torch
@@ -6,11 +14,12 @@ import random
 import pandas as pd
 import yaml
 
-from MCS_test.utilities import generate_sequence
-from MCS_test.FE import BeamAnalysis
-from models.Baselines import ResNet
-from models.MBCNNSR import MBCNNSR
-from models.MSFNO import MSFNO
+from utilities.mcs_util import generate_sequence
+from utilities.euler_bernoulli_beam_fem import BeamAnalysis
+
+from models.msfno import MSFNO
+from models.resnet import ResNet
+from models.mosrnet import MoSRNet
 
 # ===================== 1. 固定随机种子 =====================
 SEED = 114514
@@ -34,25 +43,21 @@ A = 65.423 * 0.0001
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 # ===================== 3. 模型加载 =====================
-model_classes = {
-    "MSFNO": MSFNO,
-    "ResNet": ResNet,
-    "MBCNNSR": MBCNNSR
-}
+MODEL_CLASSES = {"msfno": MSFNO, "resnet": ResNet, "mosrnet": MoSRNet}
 
-intep_path = "EXP4-MBCNNSR-BeamDI02_T8000-RD-250724-185445.yaml"
-msfno_path = "EXP1-MSFNO-BeamDI02_T8000-DD-250721-164537.yaml"
-resnet_path = "EXP1-ResNet-BeamDI02_T8000-DD-250721-170607.yaml"
+INTEP_CFG  = "mosrnet-beamdi_num_t8000-run01-250814-164957.yaml"  
+MSFNO_CFG  = "msfno-beamdi_num_t8000-run01-250814-165002.yaml"   
+RESNET_CFG = "resnet-beamdi_num_t8000-run01-250814-165006.yaml"
 
-with open(f"./configs/{intep_path}", "r") as f:
+with open(f"./configs/{INTEP_CFG}", "r") as f:
     intep_config = yaml.load(f, Loader=yaml.SafeLoader)
-with open(f"./configs/{msfno_path}", "r") as f:
+with open(f"./configs/{MSFNO_CFG}", "r") as f:
     msfno_config = yaml.load(f, Loader=yaml.SafeLoader)
-with open(f"./configs/{resnet_path}", "r") as f:
+with open(f"./configs/{RESNET_CFG}", "r") as f:
     resnet_config = yaml.load(f, Loader=yaml.SafeLoader)
 
 # 加载intep模型
-model_class = model_classes[intep_config["model"]["model"]]
+model_class = MODEL_CLASSES[intep_config["model"]["model"]]
 intep_model = model_class(**intep_config["model"]["para"]).to(device)
 model_dir = os.path.join(intep_config["paths"]["results_path"], "model")
 for file in os.listdir(model_dir):
@@ -63,7 +68,7 @@ state_dict = torch.load(intep_ckpt_path, map_location=device, weights_only=True)
 intep_model.load_state_dict(state_dict)
 
 # 加载MSFNO模型
-model_class = model_classes[msfno_config["model"]["model"]]
+model_class = MODEL_CLASSES[msfno_config["model"]["model"]]
 msfno_model = model_class(**msfno_config["model"]["para"]).to(device)
 model_dir = os.path.join(msfno_config["paths"]["results_path"], "model")
 for file in os.listdir(model_dir):
@@ -74,7 +79,7 @@ state_dict = torch.load(msfno_ckpt_path, map_location=device, weights_only=True)
 msfno_model.load_state_dict(state_dict)
 
 # 加载ResNet模型
-model_class = model_classes[resnet_config["model"]["model"]]
+model_class = MODEL_CLASSES[resnet_config["model"]["model"]]
 resnet_model = model_class(**resnet_config["model"]["para"]).to(device)
 model_dir = os.path.join(resnet_config["paths"]["results_path"], "model")
 for file in os.listdir(model_dir):
@@ -183,7 +188,7 @@ for _ in tqdm(range(n_sim), desc="Running Monte Carlo Simulation"):
     resnet_int_idx_list.append(resnet_int_idx)
 
 # ===================== 6. 保存csv结果 =====================
-os.makedirs("./MSC_test", exist_ok=True)
+os.makedirs("./results/mcs_test", exist_ok=True)
 results_df = pd.DataFrame({
     "true_idx": true_idx_list,
     "msfno_idx": msfno_idx_list,
@@ -191,5 +196,5 @@ results_df = pd.DataFrame({
     "msfno_int_idx": msfno_int_idx_list,
     "resnet_int_idx": resnet_int_idx_list
 })
-results_df.to_csv("./MSC_test/msc_maxpos_rawidx.csv", index=False)
-print("最大损伤单元号结果已保存至 ./MSC_test/msc_maxpos_rawidx.csv")
+results_df.to_csv("./results/mcs_test/msc_maxpos_rawidx.csv", index=False)
+print("结果已保存")

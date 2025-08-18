@@ -71,6 +71,11 @@ scheduler:
   initial_ratio: 0
   scheduler: ExpLRScheduler
   warmup_epochs: 20
+status:
+  train_count: 1
+  train_history:
+  - end_time: '2025-08-14 19:04:50'
+    start_time: '2025-08-14 17:45:38'
 train:
   batch_size: 16
   epochs: 170
