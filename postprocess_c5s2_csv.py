@@ -73,7 +73,7 @@ def C5S2_r2_before_biascompen(
     data_name="beamdi_num",
     validdata="beamdi_num_v1000",
     down_idx=None,                 # if None -> 9-point uniform indices
-    dir = r"./postprocessed",
+    dir = r"./results/postprocessed",
     type = "csv",
     loc  = "C5S2",
     name = "C5S2-MS-FNO_SignedError+Intact"
@@ -177,7 +177,7 @@ def C5S2_r2_after_biascompen(
     data_name="beamdi_num",
     validdata="beamdi_num_v1000",
     down_idx=None,                 # if None -> 9-point uniform indices
-    dir = r"./postprocessed",
+    dir = r"./results/postprocessed",
     L_beam=5.4, E=210e9, I=57.48e-8, rho=7850.0, A=65.423 * 0.0001,
     n_elem=540,
     type = "csv",
@@ -315,7 +315,7 @@ def C5S2_r2_onlypredmodel(
     data_name="beamdi_num",
     validdata="beamdi_num_v1000",
     down_idx=None,                 # if None -> 9-point uniform indices
-    dir = r"./postprocessed",
+    dir = r"./results/postprocessed",
     type = "csv",
     loc  = "C5S2",
     name = "C5S2-MS-FNO_SignedError+Intact"

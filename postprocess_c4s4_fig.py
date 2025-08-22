@@ -2,7 +2,7 @@
 Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
 Date: 2025-08-12 18:06:19
 LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
-LastEditTime: 2025-08-15 16:22:10
+LastEditTime: 2025-08-22 15:57:22
 '''
 
 
@@ -34,7 +34,7 @@ def C4S4_fig01(
     MSFNO_cfgpath,
     ResNet_cfgpath,
     MoSRNet_cfgpath,
-    dir = r"./postprocessed",
+    dir = r"./results/postprocessed",
     type = "fig",
     loc = "C4S4",
     name = "Training and validation loss curves of MS-FNO and RseNet"
@@ -66,10 +66,10 @@ def C4S4_fig01(
             raise KeyError(f"{df_name} CSV missing required columns 'T_loss' and/or 'V_loss'.")
 
     # ---- Extract ----
-    MSFNO_T = MSFNO_df["T_loss"].values
-    MSFNO_V = MSFNO_df["V_loss"].values
-    ResNet_T = ResNet_df["T_loss"].values
-    ResNet_V = ResNet_df["V_loss"].values
+    MSFNO_T = MSFNO_df["Tloss_LpLoss.mean"].values
+    MSFNO_V = MSFNO_df["Vloss_LpLoss.mean"].values
+    ResNet_T = ResNet_df["Tloss_LpLoss.mean"].values
+    ResNet_V = ResNet_df["Vloss_LpLoss.mean"].values
 
     x_msfno_tr = range(len(MSFNO_T))
     x_msfno_va = range(len(MSFNO_V))
@@ -77,7 +77,7 @@ def C4S4_fig01(
     x_resnet_va = range(len(ResNet_V))
 
     # ---- Plot ----
-    fig, axes = plt.subplots(1, 2, figsize=(18, 8))
+    fig, axes = plt.subplots(1, 2, figsize=(20, 7))
     ax_tr, ax_va = axes
 
     # 设置背景色
@@ -131,7 +131,7 @@ def C4S4_fig02(
     MSFNO_cfgpath,
     ResNet_cfgpath,
     MoSRNet_cfgpath,
-    dir = r"./postprocessed",
+    dir = r"./results/postprocessed",
     type = "fig",
     loc = "C4S4",
     name = "Training and validation loss curves of MoSRNet"
@@ -162,7 +162,7 @@ def C4S4_fig02(
     x_mosrnet_va = range(len(MoSRNet_V))
 
     # ---- Plot ----
-    fig, axes = plt.subplots(1, 2, figsize=(18, 8))
+    fig, axes = plt.subplots(1, 2, figsize=(20, 7))
     ax_tr, ax_va = axes
 
     # 设置背景色

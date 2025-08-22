@@ -2,7 +2,7 @@
 Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
 Date: 2025-08-12 18:06:19
 LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
-LastEditTime: 2025-08-18 19:22:44
+LastEditTime: 2025-08-22 16:36:46
 '''
 
 
@@ -14,7 +14,7 @@ import random
 import pandas as pd
 import yaml
 
-from utilities.mcs_util import generate_sequence
+from utilities.mcs_util import generate_sequence, interpolate_1d
 from utilities.euler_bernoulli_beam_fem import BeamAnalysis
 
 from models.msfno import MSFNO
@@ -30,7 +30,7 @@ if torch.cuda.is_available():
     torch.cuda.manual_seed_all(SEED)
 
 # ===================== 2. 参数设置 =====================
-n_sim = 5000                # 蒙特卡洛样本数
+n_sim = 8000                # 蒙特卡洛样本数
 n_elem = 540                # 单元总数
 down_idx = np.array([0, 68, 135, 203, 270, 337, 405, 473, 540], dtype=np.int32) # 下采样位置
 
@@ -132,6 +132,7 @@ resnet_idx_list = []
 msfno_int_idx_list = []
 resnet_int_idx_list = []
 
+
 for _ in tqdm(range(n_sim), desc="Running Monte Carlo Simulation"):
     # 1) 生成损伤场及真值
     dmg, loc, dgr = generate_sequence(length=n_elem, y=10, noise_range=0.05, dip_range=(0.15, 0.6))
@@ -175,7 +176,13 @@ for _ in tqdm(range(n_sim), desc="Running Monte Carlo Simulation"):
     msfno_int_res = msfno_intact_intep_pred.squeeze().cpu().numpy() - msfno_intep_pred
     resnet_int_res = resnet_intact_intep_pred.squeeze().cpu().numpy() - resnet_intep_pred
 
-    # 5) 保存最大损伤单元号
+
+    # Example usage
+    msfno_res = interpolate_1d(msfno_res, n_elem)
+    resnet_res = interpolate_1d(resnet_res, n_elem)
+    msfno_int_res = interpolate_1d(msfno_int_res, n_elem)
+    resnet_int_res = interpolate_1d(resnet_int_res, n_elem)
+
     msfno_idx = int(np.argmax(msfno_res))
     resnet_idx = int(np.argmax(resnet_res))
     msfno_int_idx = int(np.argmax(msfno_int_res))

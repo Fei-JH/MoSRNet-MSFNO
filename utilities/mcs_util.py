@@ -2,11 +2,12 @@
 Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
 Date: 2025-08-12 18:06:32
 LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
-LastEditTime: 2025-08-13 18:37:58
+LastEditTime: 2025-08-22 16:36:26
 '''
 
 
 import numpy as np
+from scipy.interpolate import interp1d
 
 def generate_sequence(length=540, y=10, noise_range=0.05, dip_range=(0.15, 0.6), seed=None):
     """
@@ -63,3 +64,10 @@ def generate_sequence(length=540, y=10, noise_range=0.05, dip_range=(0.15, 0.6),
     return seq, x, m
 
 
+def interpolate_1d(arr, tgt):
+    """Linearly interpolate a length-541 array to length-540 using interp1d"""
+    ori_len = len(arr)
+    x_old = np.linspace(0, 1, ori_len)
+    f = interp1d(x_old, arr, kind='linear')  # 'linear' for linear interpolation
+    x_new = np.linspace(0, 1, tgt)
+    return f(x_new)

@@ -35,6 +35,7 @@ class R2(object):
         - r2 (torch.Tensor): 决定系数 R^2
         """
         # 确保 predicted 和 actual 是相同形状的张量
+        # print(predicted.shape, actual.shape)
         assert predicted.shape == actual.shape, "预测值和实际值的形状必须相同"
 
         # 计算实际值的平均值（对每个样本单独计算均值）

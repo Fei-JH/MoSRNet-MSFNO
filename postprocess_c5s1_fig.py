@@ -69,7 +69,7 @@ def C5S1_fig01_original(
     data_name="beamdi_num",        # fixed per request
     subset="beamdi_num_v1000",     # 1000 samples
     sample_index=34,               # pick the 34-th sample (0-based index)
-    dir = r"./postprocessed",
+    dir = r"./results/postprocessed",
     type = "fig",
     loc = "C5S1",
     name = "Original-input prediction vs Ground Truth"
@@ -131,7 +131,7 @@ def C5S1_fig01_original(
     pos_mask = pred > 0
     neg_mask = ~pos_mask
 
-    fig, ax = plt.subplots(figsize=(10, 8))
+    fig, ax = plt.subplots(figsize=(10, 7.5))
 
     # prediction curve
     ax.plot(x_idx, pred, color="#3A3A3A", lw=1, alpha=1.0, zorder=3, label="_nolegend_")
@@ -147,12 +147,12 @@ def C5S1_fig01_original(
     ax.axhline(0, color="k", linewidth=1.5, zorder=10)
     ax.set_xlim(0, 5400)
     ax.set_xticks(np.linspace(0, 5400, num=9))
-    ax.set_ylim(-80, 80)
+    ax.set_ylim(-85, 85)
     ax.set_yticks(np.linspace(-75, 75, num=7))
     ax.yaxis.set_major_formatter(FuncFormatter(_fmt_abs_tick))
 
-    ax.axhspan(0, 80,  color="#feece7", alpha=1.0, zorder=0)
-    ax.axhspan(-80, 0, color="#deeeed", alpha=1.0, zorder=0)
+    ax.axhspan(0, 85,  color="#feece7", alpha=1.0, zorder=0)
+    ax.axhspan(-85, 0, color="#deeeed", alpha=1.0, zorder=0)
 
     ax.text(150,  65, "Stiffness Loss",     color="#EE7E77", va="center", ha="left", fontsize=28, fontweight="bold")
     ax.text(150, -65, "Stiffness Increase", color="#68A7BE",  va="center", ha="left", fontsize=28, fontweight="bold")
@@ -196,7 +196,7 @@ def C5S1_fig02_reconstructed(
     subset="beamdi_num_v1000",
     sample_index=34,
     down_indices=None,             # custom downsample index list; if None, use 9 points uniform-like
-    dir = r"./postprocessed",
+    dir = r"./results/postprocessed",
     type = "fig",
     loc = "C5S1",
     name = "Reconstructed-input prediction vs Ground Truth"
@@ -271,7 +271,7 @@ def C5S1_fig02_reconstructed(
     pos_mask = pred > 0
     neg_mask = ~pos_mask
 
-    fig, ax = plt.subplots(figsize=(10, 8))
+    fig, ax = plt.subplots(figsize=(10, 7.5))
 
     ax.plot(x_idx, pred, color="#3A3A3A", lw=1, alpha=1.0, zorder=3, label="_nolegend_")
     ax.fill_between(x_idx, 0, pred, where=pos_mask, facecolor="#EE7E77", alpha=1.0, zorder=2, label="_nolegend_")
@@ -283,12 +283,12 @@ def C5S1_fig02_reconstructed(
     ax.axhline(0, color="k", linewidth=1.5, zorder=10)
     ax.set_xlim(0, 5400)
     ax.set_xticks(np.linspace(0, 5400, num=9))
-    ax.set_ylim(-80, 80)
+    ax.set_ylim(-85, 85)
     ax.set_yticks(np.linspace(-75, 75, num=7))
     ax.yaxis.set_major_formatter(FuncFormatter(_fmt_abs_tick))
 
-    ax.axhspan(0, 80,  color="#feece7", alpha=1.0, zorder=0)
-    ax.axhspan(-80, 0, color="#deeeed", alpha=1.0, zorder=0)
+    ax.axhspan(0, 85,  color="#feece7", alpha=1.0, zorder=0)
+    ax.axhspan(-85, 0, color="#deeeed", alpha=1.0, zorder=0)
 
     ax.text(150,  65, "Stiffness Loss",     color="#EE7E77", va="center", ha="left", fontsize=28, fontweight="bold")
     ax.text(150, -65, "Stiffness Increase", color="#68A7BE",  va="center", ha="left", fontsize=28, fontweight="bold")
@@ -336,7 +336,7 @@ p1 = C5S1_fig01_original(
     data_name="beamdi_num",
     subset="beamdi_num_v1000",
     sample_index=SAMPLE_INDEX,
-    dir="./postprocessed",
+    dir="./results/postprocessed",
     type="fig",
     loc="C5S1",
     name="numerical validation results _Ori_MSFNO"
@@ -351,7 +351,7 @@ p2 = C5S1_fig01_original(
     data_name="beamdi_num",
     subset="beamdi_num_v1000",
     sample_index=SAMPLE_INDEX,
-    dir="./postprocessed",
+    dir="./results/postprocessed",
     type="fig",
     loc="C5S1",
     name="numerical validation results _Ori_RESNET"
@@ -368,7 +368,7 @@ p3 = C5S1_fig02_reconstructed(
     subset="beamdi_num_v1000",
     sample_index=SAMPLE_INDEX,
     down_indices=None, 
-    dir="./postprocessed",
+    dir="./results/postprocessed",
     type="fig",
     loc="C5S1",
     name="numerical validation results _Itp_MSFNO"
@@ -384,7 +384,7 @@ p4 = C5S1_fig02_reconstructed(
     subset="beamdi_num_v1000",
     sample_index=SAMPLE_INDEX,
     down_indices=None,  
-    dir="./postprocessed",
+    dir="./results/postprocessed",
     type="fig",
     loc="C5S1",
     name="numerical validation results _Itp_RESNET"

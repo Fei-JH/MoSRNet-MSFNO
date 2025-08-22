@@ -30,7 +30,7 @@ def C6S3_fig01(
     data_name="beamdi_exp",             # dataset root under ./datasets/
     validdata="beamdi_exp_scut",                   # validation file stem
     baseline="rein",                    # baseline file stem
-    dir = r"./postprocessed",           # C4S4-style saving root
+    dir = r"./results/postprocessed",           # C4S4-style saving root
     type = "fig",
     loc = "C6S3",
     name = None                         # figure base name; saved as {name}_{validdata}.png
@@ -146,7 +146,7 @@ def C6S3_fig01(
     pos_mask = output > 0
     neg_mask = ~pos_mask
 
-    fig, ax = plt.subplots(figsize=(10, 8))
+    fig, ax = plt.subplots(figsize=(10, 7.5))
 
     # predicted curve
     ax.plot(x_indices, output, color="#3A3A3A", lw=1, alpha=1.0, zorder=3, label="_nolegend_")
@@ -162,7 +162,7 @@ def C6S3_fig01(
     ax.axhline(0, color="k", linewidth=1.5, zorder=10)
     ax.set_xlim(0, 5400)
     ax.set_xticks(np.linspace(0, 5400, num=9))
-    ax.set_ylim(-60, 160)
+    ax.set_ylim(-65, 165)
     ax.set_yticks(np.linspace(-50, 150, num=9))
 
     # custom y tick: show absolute values
@@ -171,11 +171,11 @@ def C6S3_fig01(
     ax.yaxis.set_major_formatter(FuncFormatter(_fmt_y))
 
     # region backgrounds and labels
-    ax.axhspan(0, 160, color="#feece7", alpha=1.0, zorder=0)   # stiffness loss region
-    ax.axhspan(-60, 0, color="#deeeed", alpha=1.0, zorder=0)   # stiffness increase region
-    ax.text(150, 142, "Stiffness Loss",     color="#EE7E77",
+    ax.axhspan(0, 165, color="#feece7", alpha=1.0, zorder=0)   # stiffness loss region
+    ax.axhspan(-65, 0, color="#deeeed", alpha=1.0, zorder=0)   # stiffness increase region
+    ax.text(150, 145, "Stiffness Loss",     color="#EE7E77",
             va="center", ha="left", fontsize=28, fontweight="bold")
-    ax.text(150, -42, "Stiffness Increase", color="#68A7BE",
+    ax.text(150, -45, "Stiffness Increase", color="#68A7BE",
             va="center", ha="left", fontsize=28, fontweight="bold")
 
     ax.set_ylabel("Stiffness Change (%)")
@@ -225,7 +225,7 @@ DATA_NAME = "beamdi_exp"
 BASELINE  = "beamdi_exp_rein"
 VALID_LIST = ["beamdi_exp_mcut", "beamdi_exp_scut", "beamdi_exp_wcut", "beamdi_exp_wedg"]
 
-SAVE_DIR = "./postprocessed"
+SAVE_DIR = "./results/postprocessed"
 TYPE = "fig"
 LOC  = "C6S3"
 

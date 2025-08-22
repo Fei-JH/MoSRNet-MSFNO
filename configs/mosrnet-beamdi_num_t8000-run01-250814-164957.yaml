@@ -59,10 +59,10 @@ model:
     dim2fct: 2
     inlen: 9
     num_subnets: 3
-    outlen: 540
+    outlen: 541
 paths:
   config_path: ./configs\mosrnet-beamdi_num_t8000-run01-250814-164957.yaml
-  results_path: ./results\mosrnet-beamdi_num\mosrnet-beamdi_num_t8000-run01-250814-164957
+  results_path: ./results/models\mosrnet-beamdi_num\mosrnet-beamdi_num_t8000-run01-250814-164957
 project:
   case: mosrnet-beamdi_num_t8000-run01-250814-164957
   description: 'SHM Framework of MoSRNet and MS-FNO '
@@ -74,10 +74,18 @@ scheduler:
   scheduler: ExpLRScheduler
   warmup_epochs: 20
 status:
-  train_count: 1
+  train_count: 5
   train_history:
   - end_time: '2025-08-14 17:12:05'
     start_time: '2025-08-14 16:59:52'
+  - end_time: null
+    start_time: '2025-08-22 14:07:57'
+  - end_time: null
+    start_time: '2025-08-22 14:10:34'
+  - end_time: null
+    start_time: '2025-08-22 14:11:03'
+  - end_time: '2025-08-22 14:26:17'
+    start_time: '2025-08-22 14:12:44'
 train:
   batch_size: 16
   down_idx:
@@ -91,7 +99,7 @@ train:
   - 473
   - 540
   epochs: 120
-  gt_idx: 540
+  gt_idx: 541
   in_channels: 3
   learning_rate: 0.001
   weight_decay: 0.01

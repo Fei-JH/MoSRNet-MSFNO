@@ -60,7 +60,7 @@ model:
     out_channels: 1
 paths:
   config_path: ./configs\resnet-beamdi_num_t8000-run01-250814-165006.yaml
-  results_path: ./results\resnet-beamdi_num\resnet-beamdi_num_t8000-run01-250814-165006
+  results_path: ./results/models\resnet-beamdi_num\resnet-beamdi_num_t8000-run01-250814-165006
 project:
   case: resnet-beamdi_num_t8000-run01-250814-165006
   description: SHM Framework of MoSRNet and MS-FNO
@@ -72,10 +72,12 @@ scheduler:
   scheduler: ExpLRScheduler
   warmup_epochs: 20
 status:
-  train_count: 1
+  train_count: 2
   train_history:
   - end_time: '2025-08-14 19:04:50'
     start_time: '2025-08-14 17:45:38'
+  - end_time: '2025-08-22 15:37:39'
+    start_time: '2025-08-22 14:47:39'
 train:
   batch_size: 16
   epochs: 170

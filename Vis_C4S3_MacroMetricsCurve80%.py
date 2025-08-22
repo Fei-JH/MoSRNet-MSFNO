@@ -1,3 +1,9 @@
+'''
+Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
+Date: 2025-08-12 18:06:19
+LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
+LastEditTime: 2025-08-19 14:36:45
+'''
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -19,7 +25,7 @@ output_dir = "./postprocess"
 os.makedirs(output_dir, exist_ok=True)
 
 # === 读取并过滤数据，仅保留目标区间 ===
-df = pd.read_csv("./MSC_test/msc_maxpos_rawidx.csv")
+df = pd.read_csv("./results/mcs_test/msc_maxpos_rawidx.csv")
 df = df[(df["true_idx"] >= valid_start) & (df["true_idx"] < valid_end)].reset_index(drop=True)
 
 case_names = ["msfno", "resnet", "msfno_int", "resnet_int"]

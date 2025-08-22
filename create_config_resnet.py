@@ -2,7 +2,7 @@
 Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
 Date: 2025-08-13 15:13:23
 LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
-LastEditTime: 2025-08-14 14:24:55
+LastEditTime: 2025-08-22 16:20:28
 '''
 
 
@@ -121,7 +121,7 @@ else:
     config["project"]["project"] = project_name
     config["project"]["case"] = case_name[:-5]
     
-    results_dir = os.path.join(r"./results", project_name)
+    results_dir = os.path.join(r"./results/models", project_name)
     results_path = os.path.join(results_dir, case_name[:-5])
     config_path = os.path.join(config_dir, case_name)
     

@@ -127,7 +127,7 @@ else:
     config["project"]["project"] = project_name
     config["project"]["case"] = case_name[:-5]
     
-    results_dir = os.path.join("./results", project_name)
+    results_dir = os.path.join(r"./results/models", project_name)
     results_path = os.path.join(results_dir, case_name[:-5])
     config_path = os.path.join(config_dir, case_name)
     

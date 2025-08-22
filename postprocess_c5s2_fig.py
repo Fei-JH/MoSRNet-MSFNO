@@ -73,7 +73,7 @@ def C5S2_MS_FNO_signed_error_plus_intact(
     L_beam=5.4, E=210e9, I=57.48e-8, rho=7850.0, A=65.423 * 0.0001,
     n_elem=540,
     # save style
-    dir = r"./postprocessed",
+    dir = r"./results/postprocessed",
     type = "fig",
     loc  = "C5S2",
     name = "C5S2-MS-FNO_SignedError+Intact"
@@ -189,7 +189,7 @@ def C5S2_MS_FNO_signed_error_plus_intact(
     x_mm_int = np.linspace(0, 5400, num=pred_int_m.shape[-1])
 
     # ----- plot (MSFNO-centric) -----
-    fig, ax = plt.subplots(figsize=(12, 7))
+    fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(x_mm_err, signed_mean_err, lw=2, color="#d62728", linestyle="-", label="Mean error on the validation set (MoSRNet + MS-FNO)")
     ax.plot(x_mm_int, pred_int_m,     lw=2, color="#1f77b4", linestyle="--", label="Prediction of intact scenario (MoSRNet + MS-FNO)")
 
@@ -201,7 +201,7 @@ def C5S2_MS_FNO_signed_error_plus_intact(
     ax.set_xlabel("Beam Span (mm)")
     ax.set_ylabel("Stiffness Loss (%)")
     ax.grid(True, linestyle="--", alpha=0.35)
-    ax.legend(loc="upper center")
+    ax.legend(loc="upper center", fontsize=20)
     plt.tight_layout()
 
     return _save_fig(fig, dir, type, loc, name)
@@ -221,7 +221,7 @@ def C5S2_ResNet_signed_error_plus_intact(
     L_beam=5.4, E=210e9, I=57.48e-8, rho=7850.0, A=65.423 * 0.0001,
     n_elem=540,
     # save style
-    dir = r"./postprocessed",
+    dir = r"./results/postprocessed",
     type = "fig",
     loc  = "C5S2",
     name = "C5S2-ResNet_SignedError+Intact"
@@ -335,19 +335,19 @@ def C5S2_ResNet_signed_error_plus_intact(
     x_mm_int = np.linspace(0, 5400, num=pred_int_r.shape[-1])
 
     # ----- plot (ResNet-centric) -----
-    fig, ax = plt.subplots(figsize=(12, 7))
+    fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(x_mm_err, signed_mean_err, lw=2, color="#d62728", linestyle="-", label="Mean error on the validation set (MoSRNet + ResNet)")
     ax.plot(x_mm_int, pred_int_r,     lw=2, color="#1f77b4", linestyle="--", label="Prediction of intact scenario (MoSRNet + ResNet)")
 
     ax.axhline(0.0, color="k", linewidth=1.2)
     ax.set_xlim(0, 5400)
     ax.set_xticks(np.linspace(0, 5400, num=9))
-    ax.set_ylim(-25, 105)
-    ax.set_yticks(np.linspace(-20, 100, num=7))
+    ax.set_ylim(-30, 90)
+    ax.set_yticks(np.linspace(-20, 80, num=6))
     ax.set_xlabel("Beam Span (mm)")
     ax.set_ylabel("Stiffness Loss (%)")
     ax.grid(True, linestyle="--", alpha=0.35)
-    ax.legend(loc="upper center")
+    ax.legend(loc="upper center", fontsize=20)
     plt.tight_layout()
 
     return _save_fig(fig, dir, type, loc, name)
@@ -362,7 +362,7 @@ def C5S2_reconstructed_withbaseline(
     subset="beamdi_num_v1000",
     sample_index=34,
     down_idx=None,             # custom downsample index list; if None, use 9 points uniform-like
-    dir = r"./postprocessed",
+    dir = r"./results/postprocessed",
     L_beam=5.4, E=210e9, I=57.48e-8, rho=7850.0, A=65.423 * 0.0001,
     n_elem=540,
     type = "fig",
@@ -469,7 +469,7 @@ def C5S2_reconstructed_withbaseline(
     pos_mask = pred > 0
     neg_mask = ~pos_mask
 
-    fig, ax = plt.subplots(figsize=(10, 8))
+    fig, ax = plt.subplots(figsize=(10, 7.5))
 
     ax.plot(x_idx, pred, color="#3A3A3A", lw=1, alpha=1.0, zorder=3, label="_nolegend_")
     ax.fill_between(x_idx, 0, pred, where=pos_mask, facecolor="#EE7E77", alpha=1.0, zorder=2, label="_nolegend_")
@@ -481,12 +481,12 @@ def C5S2_reconstructed_withbaseline(
     ax.axhline(0, color="k", linewidth=1.5, zorder=10)
     ax.set_xlim(0, 5400)
     ax.set_xticks(np.linspace(0, 5400, num=9))
-    ax.set_ylim(-80, 80)
+    ax.set_ylim(-85, 85)
     ax.set_yticks(np.linspace(-75, 75, num=7))
     ax.yaxis.set_major_formatter(FuncFormatter(_fmt_abs_tick))
 
-    ax.axhspan(0, 80,  color="#feece7", alpha=1.0, zorder=0)
-    ax.axhspan(-80, 0, color="#deeeed", alpha=1.0, zorder=0)
+    ax.axhspan(0, 85,  color="#feece7", alpha=1.0, zorder=0)
+    ax.axhspan(-85, 0, color="#deeeed", alpha=1.0, zorder=0)
 
     ax.text(150,  65, "Stiffness Loss",     color="#EE7E77", va="center", ha="left", fontsize=28, fontweight="bold")
     ax.text(150, -65, "Stiffness Increase", color="#68A7BE",  va="center", ha="left", fontsize=28, fontweight="bold")
@@ -549,7 +549,7 @@ if __name__ == "__main__":
     down_idx = np.array([0, 68, 135, 203, 270, 337, 405, 473, 540], dtype=int)
 
     # --------- save style ---------
-    out_dir  = "./postprocessed"
+    out_dir  = "./results/postprocessed"
     out_type = "fig"
     out_loc  = "C5S2"
 
@@ -591,7 +591,7 @@ if __name__ == "__main__":
         subset="beamdi_num_v1000",
         sample_index=SAMPLE_INDEX,
         down_idx=None, 
-        dir="./postprocessed",
+        dir="./results/postprocessed",
         L_beam=5.4, E=210e9, I=57.48e-8, rho=7850.0, A=65.423 * 0.0001,
         n_elem=540,
         type="fig",
@@ -609,7 +609,7 @@ if __name__ == "__main__":
         subset="beamdi_num_v1000",
         sample_index=SAMPLE_INDEX,
         down_idx=None,  
-        dir="./postprocessed",
+        dir="./results/postprocessed",
         L_beam=5.4, E=210e9, I=57.48e-8, rho=7850.0, A=65.423 * 0.0001,
         n_elem=540,
         type="fig",
