@@ -2,7 +2,7 @@
 Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
 Date: 2025-08-13 15:14:27
 LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
-LastEditTime: 2025-08-14 16:47:14
+LastEditTime: 2025-08-26 17:18:32
 '''
 
 
@@ -146,8 +146,6 @@ def run_train_1d(config, config_name, device, model_class, use_wandb=False, swee
 
 #%%
 model_classes = {"mosrnet":MoSRNet}
-
-# config_name = "EXP5-MBCNNSR-BeamDI02_T8000-RD-250724-174406.yaml"
 
 if __name__ == "__main__":
     directory = "./configs"
