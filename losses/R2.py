@@ -2,59 +2,39 @@
 Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
 Date: 2025-08-12 18:06:32
 LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
-LastEditTime: 2025-08-13 20:10:49
+LastEditTime: 2025-10-21 16:10:24
 '''
-
 
 import torch
 
 class R2(object):
     def __init__(self, size_average=True, reduction=True, epsilon=1e-8):
-        """
-        初始化 R2 类
 
-        参数:
-        - size_average (bool): 是否对误差进行平均处理
-        - reduction (bool): 是否应用缩减操作（均值或求和）
-        - epsilon (float): 小常数，用于避免总平方和为零的情况
-        """
         super(R2, self).__init__()
-        self.epsilon = epsilon            # 防止除以零的小常数
-        self.size_average = size_average   # 是否对误差进行平均处理
-        self.reduction = reduction        # 是否应用缩减操作（均值或求和）
+        self.epsilon = epsilon            
+        self.size_average = size_average   
+        self.reduction = reduction        
 
     def __call__(self, predicted, actual):
-        """
-        计算决定系数 R^2
+        
+        assert predicted.shape == actual.shape, "Predicted and actual tensors must have the same shape."
 
-        参数:
-        - predicted (torch.Tensor): 预测值，形状为 [batch_size, length]
-        - actual (torch.Tensor): 实际值，形状为 [batch_size, length]
+        # calculate the mean of actual values for each sample
+        y_mean = torch.mean(actual, dim=1, keepdim=True)  # [batch_size, 1]
 
-        返回:
-        - r2 (torch.Tensor): 决定系数 R^2
-        """
-        # 确保 predicted 和 actual 是相同形状的张量
-        # print(predicted.shape, actual.shape)
-        assert predicted.shape == actual.shape, "预测值和实际值的形状必须相同"
+        # calculate residual sum of squares SS_res (for each sample)
+        ss_res = torch.sum((actual - predicted) ** 2, dim=1)  # [batch_size]
 
-        # 计算实际值的平均值（对每个样本单独计算均值）
-        y_mean = torch.mean(actual, dim=1, keepdim=True)  # 形状: [batch_size, 1]
+        # calculate total sum of squares SS_tot (for each sample)
+        ss_tot = torch.sum((actual - y_mean) ** 2, dim=1) + self.epsilon  # [batch_size]
 
-        # 计算残差平方和 SS_res（对每个样本单独计算）
-        ss_res = torch.sum((actual - predicted) ** 2, dim=1)  # 形状: [batch_size]
+        # calculate R^2 for each sample
+        r2 = 1 - (ss_res / ss_tot)  # [batch_size]
 
-        # 计算总平方和 SS_tot（对每个样本单独计算），添加 epsilon 以防 SS_tot 为零
-        ss_tot = torch.sum((actual - y_mean) ** 2, dim=1) + self.epsilon  # 形状: [batch_size]
-
-        # 计算 R^2（对每个样本单独计算）
-        r2 = 1 - (ss_res / ss_tot)  # 形状: [batch_size]
-
-        # 根据 reduction 参数决定是否进行缩减
         if self.reduction:
             if self.size_average:
-                return torch.mean(r2)  # 返回所有样本的 R^2 均值
+                return torch.mean(r2)  # return the average R^2 over all samples
             else:
-                return torch.sum(r2)  # 返回所有样本的 R^2 总和
+                return torch.sum(r2)  # return the sum of R^2 over all samples
         else:
-            return r2  # 返回每个样本的 R^2 值，形状: [batch_size]
+            return r2  

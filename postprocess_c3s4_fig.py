@@ -2,14 +2,10 @@
 Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
 Date: 2025-08-12 18:06:19
 LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
-LastEditTime: 2025-08-22 18:26:54
+LastEditTime: 2025-10-21 15:28:23
 '''
 
-
-import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.metrics import confusion_matrix, accuracy_score, recall_score, precision_score, f1_score, precision_recall_fscore_support
 import os
 import yaml
 import pandas as pd
@@ -30,17 +26,16 @@ import yaml
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def C4S4_losscurve(
+def C3S4_losscurve(
     model_cfgpath,
     dir = r"./results/postprocessed",
     type = "fig",
-    loc = "C4S4",
+    loc = "C3S4",
     name = "Training and validation loss curves of MS-FNO and RseNet"
 ):
-    msfno_color = "#E23C5D"
-    resnet_color = "#FFB42C"
+
     linewidth = 2
-    bg_color = "#FFFEFC"  # 浅蓝灰
+    bg_color = "#FFFEFC"  
 
     # ---- Load configs ----
     with open(f"./configs/{model_cfgpath}", "r") as f:
@@ -109,6 +104,7 @@ def C4S4_losscurve(
     save_path = os.path.join(dir, loc, type)
     os.makedirs(save_path, exist_ok=True)
     fig.savefig(os.path.join(save_path, f"{name}_{title}.png"), dpi=300, bbox_inches="tight")
+    print(f"Figure saved to {os.path.join(save_path, f'{name}_{title}.png')}")
     plt.close(fig)
 
 
@@ -118,15 +114,15 @@ ResNet_cfgpath = "resnet-beamdi_num_t8000-run01-250814-165006.yaml"
 MoSRNet_cfgpath = "mosrnet-beamdi_num_t8000-run01-250814-164957.yaml"
 
 if __name__ == "__main__":
-    C4S4_losscurve(
+    C3S4_losscurve(
     model_cfgpath=MoSRNet_cfgpath
     )
 
-    C4S4_losscurve(
+    C3S4_losscurve(
     model_cfgpath=MSFNO_cfgpath
     )
 
-    C4S4_losscurve(
+    C3S4_losscurve(
     model_cfgpath=ResNet_cfgpath
     )
     

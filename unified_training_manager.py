@@ -2,20 +2,8 @@
 Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
 Date: 2025-08-14 12:00:18
 LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
-LastEditTime: 2025-08-14 16:58:47
+LastEditTime: 2025-10-21 15:17:50
 '''
-
-
-# -*- coding: utf-8 -*-
-"""
-Controller (import-based) with CLI args:
-- One-line run with fixed choices via argparse
-- Or interactive mode when args missing
-- Pre-select all configs, then execute tasks sequentially
-- Four-line header per task; total elapsed printed at the end
-- Fixed print width: 80 columns
-- Runs inside CURRENT interpreter (no interpreter switching)
-"""
 
 import os
 import sys

@@ -1,3 +1,10 @@
+'''
+Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
+Date: 2025-08-15 18:32:14
+LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
+LastEditTime: 2025-10-21 15:34:08
+'''
+
 import os
 import numpy as np
 import torch
@@ -50,8 +57,8 @@ def _fmt_abs_tick(y, pos):
     """Formatter to show absolute value on y-axis."""
     return f"{int(abs(y))}"
 
-def _save_c4s4_style(fig, dir, type, loc, name):
-    """Save figure to {dir}/{loc}/{type}/{name}.png (C4S4-style)."""
+def _save_C4S1_style(fig, dir, type, loc, name):
+    """Save figure to {dir}/{loc}/{type}/{name}.png (C4S1-style)."""
     save_dir = os.path.join(dir, loc, type)
     os.makedirs(save_dir, exist_ok=True)
     out_path = os.path.join(save_dir, f"{name}.png")
@@ -59,9 +66,9 @@ def _save_c4s4_style(fig, dir, type, loc, name):
     plt.close(fig)
     return out_path
 
-# ---------------------------- C5S1: original high-res input ----------------------------
+# ---------------------------- C4S1: original high-res input ----------------------------
 
-def C5S1_fig01_original(
+def C4S1_fig01_original(
     Intep_cfgpath,                 # interpolation model cfg (not used here but kept for symmetry)
     MSFNO_cfgpath,                 # available if you choose msfno as predictor
     ResNet_cfgpath,                # available if you choose resnet as predictor
@@ -71,11 +78,11 @@ def C5S1_fig01_original(
     sample_index=34,               # pick the 34-th sample (0-based index)
     dir = r"./results/postprocessed",
     type = "fig",
-    loc = "C5S1",
+    loc = "C4S1",
     name = "Original-input prediction vs Ground Truth"
 ):
     """
-    Plot C5S1 (original data): predictor consumes high-res modes + grid channel.
+    Plot C4S1 (original data): predictor consumes high-res modes + grid channel.
     No baseline; model output is directly used. Ground Truth is drawn as band + step curve.
     """
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -160,9 +167,9 @@ def C5S1_fig01_original(
     ax.set_ylabel("Stiffness Change (%)")
     ax.set_xlabel("Beam Span (mm)")
 
-    red_patch  = MplPatch(color="#EE7E77", edgecolor="none")
-    blue_patch = MplPatch(color="#68A7BE", edgecolor="none")
-    gt_patch   = MplPatch(facecolor="#CFCFCF", edgecolor="none")
+    red_patch  = MplPatch(color="#EE7E77")
+    blue_patch = MplPatch(color="#68A7BE")
+    gt_patch   = MplPatch(facecolor="#CFCFCF")
 
     if predictor == "msfno":
         model_label = "MS-FNO"
@@ -181,13 +188,13 @@ def C5S1_fig01_original(
 
     # save (append subset & sample index to name for traceability)
     if name is None:
-        name = f"C5S1_Original_{pred_key.upper()}"
+        name = f"C4S1_Original_{pred_key.upper()}"
     name_full = f"{name}-{subset}-idx{sample_index}"
-    return _save_c4s4_style(fig, dir, type, loc, name_full)
+    return _save_C4S1_style(fig, dir, type, loc, name_full)
 
-# ---------------------------- C5S1: downsample -> reconstruct -> predict ----------------------------
+# ---------------------------- C4S1: downsample -> reconstruct -> predict ----------------------------
 
-def C5S1_fig02_reconstructed(
+def C4S1_fig02_reconstructed(
     Intep_cfgpath,                 # used to reconstruct from downsampled input
     MSFNO_cfgpath,
     ResNet_cfgpath,
@@ -198,11 +205,11 @@ def C5S1_fig02_reconstructed(
     down_indices=None,             # custom downsample index list; if None, use 9 points uniform-like
     dir = r"./results/postprocessed",
     type = "fig",
-    loc = "C5S1",
+    loc = "C4S1",
     name = "Reconstructed-input prediction vs Ground Truth"
 ):
     """
-    Plot C5S1 (reconstructed): downsample original modes -> reconstruction via Intep model -> predictor.
+    Plot C4S1 (reconstructed): downsample original modes -> reconstruction via Intep model -> predictor.
     No baseline; model output is directly used. Ground Truth is drawn as band + step curve.
     """
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -296,9 +303,9 @@ def C5S1_fig02_reconstructed(
     ax.set_ylabel("Stiffness Change (%)")
     ax.set_xlabel("Beam Span (mm)")
 
-    red_patch  = MplPatch(color="#EE7E77", edgecolor="none")
-    blue_patch = MplPatch(color="#68A7BE", edgecolor="none")
-    gt_patch   = MplPatch(facecolor="#CFCFCF", edgecolor="none")
+    red_patch  = MplPatch(color="#EE7E77")
+    blue_patch = MplPatch(color="#68A7BE")
+    gt_patch   = MplPatch(facecolor="#CFCFCF")
 
     if predictor == "msfno":
         model_label = "MS-FNO"
@@ -316,9 +323,9 @@ def C5S1_fig02_reconstructed(
     plt.tight_layout()
 
     if name is None:
-        name = f"C5S1_Reconstructed_{pred_key.upper()}"
+        name = f"C4S1_Reconstructed_{pred_key.upper()}"
     name_full = f"{name}-{subset}-idx{sample_index}"
-    return _save_c4s4_style(fig, dir, type, loc, name_full)
+    return _save_C4S1_style(fig, dir, type, loc, name_full)
 
 
 # cfg paths
@@ -327,66 +334,65 @@ MSFNO_CFG  = "msfno-beamdi_num_t8000-run01-250814-165002.yaml"
 RESNET_CFG = "resnet-beamdi_num_t8000-run01-250814-165006.yaml"
 SAMPLE_INDEX = 34
 
-# 原生数据预测
-p1 = C5S1_fig01_original(
-    Intep_cfgpath=INTEP_CFG,
-    MSFNO_cfgpath=MSFNO_CFG,
-    ResNet_cfgpath=RESNET_CFG,
-    predictor="msfno",
-    data_name="beamdi_num",
-    subset="beamdi_num_v1000",
-    sample_index=SAMPLE_INDEX,
-    dir="./results/postprocessed",
-    type="fig",
-    loc="C5S1",
-    name="numerical validation results _Ori_MSFNO"
-)
-print("Saved:", p1)
+if __name__ == "__main__":
+    p1 = C4S1_fig01_original(
+        Intep_cfgpath=INTEP_CFG,
+        MSFNO_cfgpath=MSFNO_CFG,
+        ResNet_cfgpath=RESNET_CFG,
+        predictor="msfno",
+        data_name="beamdi_num",
+        subset="beamdi_num_v1000",
+        sample_index=SAMPLE_INDEX,
+        dir="./results/postprocessed",
+        type="fig",
+        loc="C4S1",
+        name="numerical validation results _Ori_MSFNO"
+    )
+    print("Saved:", p1)
 
-p2 = C5S1_fig01_original(
-    Intep_cfgpath=INTEP_CFG,
-    MSFNO_cfgpath=MSFNO_CFG,
-    ResNet_cfgpath=RESNET_CFG,
-    predictor="resnet",
-    data_name="beamdi_num",
-    subset="beamdi_num_v1000",
-    sample_index=SAMPLE_INDEX,
-    dir="./results/postprocessed",
-    type="fig",
-    loc="C5S1",
-    name="numerical validation results _Ori_RESNET"
-)
-print("Saved:", p2)
+    p2 = C4S1_fig01_original(
+        Intep_cfgpath=INTEP_CFG,
+        MSFNO_cfgpath=MSFNO_CFG,
+        ResNet_cfgpath=RESNET_CFG,
+        predictor="resnet",
+        data_name="beamdi_num",
+        subset="beamdi_num_v1000",
+        sample_index=SAMPLE_INDEX,
+        dir="./results/postprocessed",
+        type="fig",
+        loc="C4S1",
+        name="numerical validation results _Ori_RESNET"
+    )
+    print("Saved:", p2)
 
-# 下采样重建后的预测
-p3 = C5S1_fig02_reconstructed(
-    Intep_cfgpath=INTEP_CFG,
-    MSFNO_cfgpath=MSFNO_CFG,
-    ResNet_cfgpath=RESNET_CFG,
-    predictor="msfno",
-    data_name="beamdi_num",
-    subset="beamdi_num_v1000",
-    sample_index=SAMPLE_INDEX,
-    down_indices=None, 
-    dir="./results/postprocessed",
-    type="fig",
-    loc="C5S1",
-    name="numerical validation results _Itp_MSFNO"
-)
-print("Saved:", p3)
+    p3 = C4S1_fig02_reconstructed(
+        Intep_cfgpath=INTEP_CFG,
+        MSFNO_cfgpath=MSFNO_CFG,
+        ResNet_cfgpath=RESNET_CFG,
+        predictor="msfno",
+        data_name="beamdi_num",
+        subset="beamdi_num_v1000",
+        sample_index=SAMPLE_INDEX,
+        down_indices=None, 
+        dir="./results/postprocessed",
+        type="fig",
+        loc="C4S1",
+        name="numerical validation results _Itp_MSFNO"
+    )
+    print("Saved:", p3)
 
-p4 = C5S1_fig02_reconstructed(
-    Intep_cfgpath=INTEP_CFG,
-    MSFNO_cfgpath=MSFNO_CFG,
-    ResNet_cfgpath=RESNET_CFG,
-    predictor="resnet",
-    data_name="beamdi_num",
-    subset="beamdi_num_v1000",
-    sample_index=SAMPLE_INDEX,
-    down_indices=None,  
-    dir="./results/postprocessed",
-    type="fig",
-    loc="C5S1",
-    name="numerical validation results _Itp_RESNET"
-)
-print("Saved:", p4)
+    p4 = C4S1_fig02_reconstructed(
+        Intep_cfgpath=INTEP_CFG,
+        MSFNO_cfgpath=MSFNO_CFG,
+        ResNet_cfgpath=RESNET_CFG,
+        predictor="resnet",
+        data_name="beamdi_num",
+        subset="beamdi_num_v1000",
+        sample_index=SAMPLE_INDEX,
+        down_indices=None,  
+        dir="./results/postprocessed",
+        type="fig",
+        loc="C4S1",
+        name="numerical validation results _Itp_RESNET"
+    )
+    print("Saved:", p4)

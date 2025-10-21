@@ -2,9 +2,8 @@
 Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
 Date: 2025-08-12 18:06:32
 LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
-LastEditTime: 2025-08-13 18:49:09
+LastEditTime: 2025-10-21 16:08:41
 '''
-
 
 import torch
 import operator
@@ -32,9 +31,9 @@ class LpLoss(object):
 
         if self.reduction:
             if self.size_average:
-                return torch.mean(all_norms)
+                return torch.mean(all_norms) # return the average Lp norm over all samples
             else:
-                return torch.sum(all_norms)
+                return torch.sum(all_norms) # return the sum of Lp norm over all samples
 
         return all_norms
 

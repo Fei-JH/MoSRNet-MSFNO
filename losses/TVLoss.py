@@ -2,45 +2,29 @@
 Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
 Date: 2025-08-12 18:06:32
 LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
-LastEditTime: 2025-08-13 18:44:55
+LastEditTime: 2025-10-21 16:11:09
 '''
-
 
 import torch
 import torch.nn as nn
 
 class TVLoss(nn.Module):
     def __init__(self, weight=1.0, reduction='mean'):
-        """
-        初始化TVLoss
 
-        参数:
-            weight (float): TV损失的权重
-            reduction (str): 指定如何减少损失。可选 'mean' 或 'sum'。
-        """
         super(TVLoss, self).__init__()
         self.weight = weight
         self.reduction = reduction
 
     def forward(self, x):
-        """
-        前向传播
-
-        参数:
-            x (torch.Tensor): 模型的输出，形状为 (batch_size, output_dim)
-
-        返回:
-            torch.Tensor: 计算得到的TV损失
-        """
-        # 计算相邻元素的差值
+        # calculate total variation loss
         diff = torch.abs(x[:, 1:] - x[:, :-1])
         if self.reduction == 'mean':
-            # 计算平均TV损失
+            # calculate mean TV loss
             tv_loss = self.weight * torch.mean(diff)
         elif self.reduction == 'sum':
-            # 计算总和TV损失
+            # calculate sum TV loss
             tv_loss = self.weight * torch.sum(diff)
         else:
-            # 不进行减少操作
+            # no reduction
             tv_loss = self.weight * diff
         return tv_loss

@@ -2,9 +2,8 @@
 Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
 Date: 2025-08-12 18:06:19
 LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
-LastEditTime: 2025-08-22 16:36:46
+LastEditTime: 2025-10-21 15:59:34
 '''
-
 
 import os
 import numpy as np
@@ -21,7 +20,7 @@ from models.msfno import MSFNO
 from models.resnet import ResNet
 from models.mosrnet import MoSRNet
 
-# ===================== 1. 固定随机种子 =====================
+
 SEED = 114514
 random.seed(SEED)
 np.random.seed(SEED)
@@ -29,10 +28,10 @@ torch.manual_seed(SEED)
 if torch.cuda.is_available():
     torch.cuda.manual_seed_all(SEED)
 
-# ===================== 2. 参数设置 =====================
-n_sim = 8000                # 蒙特卡洛样本数
-n_elem = 540                # 单元总数
-down_idx = np.array([0, 68, 135, 203, 270, 337, 405, 473, 540], dtype=np.int32) # 下采样位置
+# ===================== parameters =====================
+n_sim = 8000                
+n_elem = 540                
+down_idx = np.array([0, 68, 135, 203, 270, 337, 405, 473, 540], dtype=np.int32) 
 
 L = 5.4
 E = 210e9
@@ -42,7 +41,7 @@ A = 65.423 * 0.0001
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-# ===================== 3. 模型加载 =====================
+# ===================== loading model =====================
 MODEL_CLASSES = {"msfno": MSFNO, "resnet": ResNet, "mosrnet": MoSRNet}
 
 INTEP_CFG  = "mosrnet-beamdi_num_t8000-run01-250814-164957.yaml"  
@@ -56,7 +55,7 @@ with open(f"./configs/{MSFNO_CFG}", "r") as f:
 with open(f"./configs/{RESNET_CFG}", "r") as f:
     resnet_config = yaml.load(f, Loader=yaml.SafeLoader)
 
-# 加载intep模型
+# load intep model
 model_class = MODEL_CLASSES[intep_config["model"]["model"]]
 intep_model = model_class(**intep_config["model"]["para"]).to(device)
 model_dir = os.path.join(intep_config["paths"]["results_path"], "model")
@@ -67,7 +66,7 @@ for file in os.listdir(model_dir):
 state_dict = torch.load(intep_ckpt_path, map_location=device, weights_only=True)
 intep_model.load_state_dict(state_dict)
 
-# 加载MSFNO模型
+# load MSFNO
 model_class = MODEL_CLASSES[msfno_config["model"]["model"]]
 msfno_model = model_class(**msfno_config["model"]["para"]).to(device)
 model_dir = os.path.join(msfno_config["paths"]["results_path"], "model")
@@ -78,7 +77,7 @@ for file in os.listdir(model_dir):
 state_dict = torch.load(msfno_ckpt_path, map_location=device, weights_only=True)
 msfno_model.load_state_dict(state_dict)
 
-# 加载ResNet模型
+# load ResNet
 model_class = MODEL_CLASSES[resnet_config["model"]["model"]]
 resnet_model = model_class(**resnet_config["model"]["para"]).to(device)
 model_dir = os.path.join(resnet_config["paths"]["results_path"], "model")
@@ -93,7 +92,7 @@ intep_model.eval()
 msfno_model.eval()
 resnet_model.eval()
 
-# ===================== 4. 计算intact工况的插值输出 =====================
+# ===================== calculate intact state =====================
 intact = np.ones(n_elem)
 beam_intact = BeamAnalysis(L, E, I, rho, A, n_elem)
 beam_intact.assemble_matrices(dmgfield=intact, mass_dmg_power=0)
@@ -125,7 +124,7 @@ with torch.no_grad():
     msfno_intact_intep_pred = msfno_model(modes_intact_intep_merged)
     resnet_intact_intep_pred = resnet_model(modes_intact_intep_merged)
 
-# ===================== 5. 蒙特卡洛仿真主循环 =====================
+# ===================== MSC =====================
 true_idx_list = []
 msfno_idx_list = []
 resnet_idx_list = []
@@ -134,11 +133,11 @@ resnet_int_idx_list = []
 
 
 for _ in tqdm(range(n_sim), desc="Running Monte Carlo Simulation"):
-    # 1) 生成损伤场及真值
+    # Generate damage scenario
     dmg, loc, dgr = generate_sequence(length=n_elem, y=10, noise_range=0.05, dip_range=(0.15, 0.6))
     true_idx = loc
 
-    # 2) 模态特征提取及归一化
+    # Compute modes for damaged beam
     beam = BeamAnalysis(L, E, I, rho, A, n_elem)
     beam.assemble_matrices(dmgfield=dmg, mass_dmg_power=0)
     beam.apply_BC()
@@ -152,7 +151,7 @@ for _ in tqdm(range(n_sim), desc="Running Monte Carlo Simulation"):
         if maxabs > 0:
             modes[i] = modes[i] / maxabs
 
-    # 3) 输入准备
+    # 3) prepare model input
     modes_down_tensor = torch.tensor(modes[:, down_idx], dtype=torch.float32).to(device).unsqueeze(0)
     with torch.no_grad():
         modes_intep = intep_model(modes_down_tensor).squeeze()
@@ -164,7 +163,7 @@ for _ in tqdm(range(n_sim), desc="Running Monte Carlo Simulation"):
     grid_tensor_full = torch.from_numpy(grid_full).float().to(device).unsqueeze(0)
     modes_merged = torch.cat((modes_tensor.squeeze(0), grid_tensor_full), dim=0).unsqueeze(0)
 
-    # 4) 模型推理
+    # 4) predict damage using MSFNO and ResNet
     with torch.no_grad():
         msfno_pred = msfno_model(modes_merged).squeeze().cpu().numpy()
         resnet_pred = resnet_model(modes_merged).squeeze().cpu().numpy()
@@ -194,7 +193,7 @@ for _ in tqdm(range(n_sim), desc="Running Monte Carlo Simulation"):
     msfno_int_idx_list.append(msfno_int_idx)
     resnet_int_idx_list.append(resnet_int_idx)
 
-# ===================== 6. 保存csv结果 =====================
+# ===================== save =====================
 os.makedirs("./results/mcs_test", exist_ok=True)
 results_df = pd.DataFrame({
     "true_idx": true_idx_list,
@@ -204,4 +203,4 @@ results_df = pd.DataFrame({
     "resnet_int_idx": resnet_int_idx_list
 })
 results_df.to_csv("./results/mcs_test/msc_maxpos_rawidx.csv", index=False)
-print("结果已保存")
+print("results saved to ./results/mcs_test/msc_maxpos_rawidx.csv")

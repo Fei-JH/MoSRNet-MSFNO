@@ -1,3 +1,10 @@
+'''
+Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
+Date: 2025-08-18 16:51:27
+LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
+LastEditTime: 2025-10-21 15:37:19
+'''
+
 import os
 import numpy as np
 import torch
@@ -6,9 +13,6 @@ import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 from tqdm import tqdm
-from matplotlib.ticker import FuncFormatter
-from matplotlib.patches import Patch as MplPatch
-from matplotlib.legend_handler import HandlerTuple
 from torch.utils.data import DataLoader, TensorDataset
 
 from models.msfno import MSFNO
@@ -41,10 +45,6 @@ def _build_model_from_cfg(cfg: dict):
         raise ValueError(f"Unknown model key: {key}")
     return MODEL_CLASSES[key](**cfg["model"]["para"])
 
-def _fmt_abs_tick(y, pos):
-    """Formatter to show absolute value on y-axis."""
-    return f"{int(abs(y))}"
-
 def _load_first_pt(cfg: dict) -> str:
     mdir = os.path.join(cfg["paths"]["results_path"], "model")
     if not os.path.isdir(mdir):
@@ -54,18 +54,11 @@ def _load_first_pt(cfg: dict) -> str:
         raise FileNotFoundError(f"No .pt found in: {mdir}")
     return os.path.join(mdir, pts[0])
 
-def _save_fig(fig, dir, type, loc, name):
-    save_dir = os.path.join(dir, loc, type)
-    os.makedirs(save_dir, exist_ok=True)
-    out_path = os.path.join(save_dir, f"{name}.png")
-    fig.savefig(out_path, dpi=300, bbox_inches="tight")
-    plt.close(fig)
-    return out_path
 
 # =========================================================
 # Function 1: cal r2 of the validation set before bias compensation
 # =========================================================
-def C5S2_r2_before_biascompen(
+def C4S2_r2_before_biascompen(
     Intep_cfgpath,                 # reconstruction/interpolation cfg (e.g., MoSRNet)
     MSFNO_cfgpath,                 # MSFNO predictor cfg
     ResNet_cfgpath, 
@@ -75,8 +68,8 @@ def C5S2_r2_before_biascompen(
     down_idx=None,                 # if None -> 9-point uniform indices
     dir = r"./results/postprocessed",
     type = "csv",
-    loc  = "C5S2",
-    name = "C5S2-MS-FNO_SignedError+Intact"
+    loc  = "C4S2",
+    name = "C4S2-MS-FNO_SignedError+Intact"
 ):
     """
     One figure (MSFNO-centric):
@@ -154,7 +147,7 @@ def C5S2_r2_before_biascompen(
     # ---- save as csv ----
     df = pd.DataFrame({
         "R2_each": results,
-        "R2_mean": [meanr2]*len(results)   # 每行都填平均值，便于对齐
+        "R2_mean": [meanr2]*len(results) 
     })
 
     save_dir = os.path.join(dir, loc, type)
@@ -169,7 +162,7 @@ def C5S2_r2_before_biascompen(
 # =========================================================
 # Function 2: cal r2 of the validation set after bias compensation
 # =========================================================
-def C5S2_r2_after_biascompen(
+def C4S2_r2_after_biascompen(
     Intep_cfgpath,                 # reconstruction/interpolation cfg (e.g., MoSRNet)
     MSFNO_cfgpath,                 # MSFNO predictor cfg
     ResNet_cfgpath, 
@@ -181,8 +174,8 @@ def C5S2_r2_after_biascompen(
     L_beam=5.4, E=210e9, I=57.48e-8, rho=7850.0, A=65.423 * 0.0001,
     n_elem=540,
     type = "csv",
-    loc  = "C5S2",
-    name = "C5S2-MS-FNO_SignedError+Intact"
+    loc  = "C4S2",
+    name = "C4S2-MS-FNO_SignedError+Intact"
 ):
     """
     One figure (MSFNO-centric):
@@ -292,7 +285,7 @@ def C5S2_r2_after_biascompen(
     # ---- save as csv ----
     df = pd.DataFrame({
         "R2_each": results,
-        "R2_mean": [meanr2]*len(results)   # 每行都填平均值，便于对齐
+        "R2_mean": [meanr2]*len(results)  
     })
 
     save_dir = os.path.join(dir, loc, type)
@@ -307,7 +300,7 @@ def C5S2_r2_after_biascompen(
 # =========================================================
 # Function 3: cal r2 of the validation set before bias compensation
 # =========================================================
-def C5S2_r2_onlypredmodel(
+def C4S2_r2_onlypredmodel(
     Intep_cfgpath,                 # reconstruction/interpolation cfg (e.g., MoSRNet)
     MSFNO_cfgpath,                 # MSFNO predictor cfg
     ResNet_cfgpath, 
@@ -317,8 +310,8 @@ def C5S2_r2_onlypredmodel(
     down_idx=None,                 # if None -> 9-point uniform indices
     dir = r"./results/postprocessed",
     type = "csv",
-    loc  = "C5S2",
-    name = "C5S2-MS-FNO_SignedError+Intact"
+    loc  = "C4S2",
+    name = "C4S2-MS-FNO_SignedError+Intact"
 ):
     """
     One figure (MSFNO-centric):
@@ -376,7 +369,7 @@ def C5S2_r2_onlypredmodel(
     # ---- save as csv ----
     df = pd.DataFrame({
         "R2_each": results,
-        "R2_mean": [meanr2]*len(results)   # 每行都填平均值，便于对齐
+        "R2_mean": [meanr2]*len(results)  
     })
 
     save_dir = os.path.join(dir, loc, type)
@@ -396,15 +389,15 @@ if __name__ == "__main__":
     # 1. MS-FNO before bias compensation
     # ============================
     print(">>> Running MS-FNO R2 BEFORE bias compensation ...")
-    df_msfno_before = C5S2_r2_before_biascompen(
+    df_msfno_before = C4S2_r2_before_biascompen(
         Intep_cfgpath=INTEP_CFG,
         MSFNO_cfgpath=MSFNO_CFG,
         ResNet_cfgpath=RESNET_CFG,
         predictor="msfno",
         data_name="beamdi_num",
         validdata="beamdi_num_v1000",
-        loc="C5S2",
-        name="C5S2-MS-FNO_r2_before"
+        loc="C4S2",
+        name="C4S2-MS-FNO_r2_before"
     )
     print(df_msfno_before.head())
 
@@ -412,15 +405,15 @@ if __name__ == "__main__":
     # 2. MS-FNO after bias compensation
     # ============================
     print(">>> Running MS-FNO R2 AFTER bias compensation ...")
-    df_msfno_after = C5S2_r2_after_biascompen(
+    df_msfno_after = C4S2_r2_after_biascompen(
         Intep_cfgpath=INTEP_CFG,
         MSFNO_cfgpath=MSFNO_CFG,
         ResNet_cfgpath=RESNET_CFG,
         predictor="msfno",
         data_name="beamdi_num",
         validdata="beamdi_num_v1000",
-        loc="C5S2",
-        name="C5S2-MS-FNO_r2_after"
+        loc="C4S2",
+        name="C4S2-MS-FNO_r2_after"
     )
     print(df_msfno_after.head())
 
@@ -428,30 +421,30 @@ if __name__ == "__main__":
     # 3. MS-FNO original
     # ============================
     print(">>> Running MS-FNO R2 AFTER bias compensation ...")
-    df_msfno_after = C5S2_r2_onlypredmodel(
+    df_msfno_after = C4S2_r2_onlypredmodel(
         Intep_cfgpath=INTEP_CFG,
         MSFNO_cfgpath=MSFNO_CFG,
         ResNet_cfgpath=RESNET_CFG,
         predictor="msfno",
         data_name="beamdi_num",
         validdata="beamdi_num_v1000",
-        loc="C5S2",
-        name="C5S2-MS-FNO_r2_ori"
+        loc="C4S2",
+        name="C4S2-MS-FNO_r2_ori"
     )
     print(df_msfno_after.head())
     # ============================
     # 4. ResNet before bias compensation
     # ============================
     print(">>> Running ResNet R2 BEFORE bias compensation ...")
-    df_resnet_before = C5S2_r2_before_biascompen(
+    df_resnet_before = C4S2_r2_before_biascompen(
         Intep_cfgpath=INTEP_CFG,
         MSFNO_cfgpath=MSFNO_CFG,
         ResNet_cfgpath=RESNET_CFG,
         predictor="resnet",
         data_name="beamdi_num",
         validdata="beamdi_num_v1000",
-        loc="C5S2",
-        name="C5S2-ResNet_r2_before"
+        loc="C4S2",
+        name="C4S2-ResNet_r2_before"
     )
     print(df_resnet_before.head())
 
@@ -459,15 +452,15 @@ if __name__ == "__main__":
     # 5. ResNet after bias compensation
     # ============================
     print(">>> Running ResNet R2 AFTER bias compensation ...")
-    df_resnet_after = C5S2_r2_after_biascompen(
+    df_resnet_after = C4S2_r2_after_biascompen(
         Intep_cfgpath=INTEP_CFG,
         MSFNO_cfgpath=MSFNO_CFG,
         ResNet_cfgpath=RESNET_CFG,
         predictor="resnet",
         data_name="beamdi_num",
         validdata="beamdi_num_v1000",
-        loc="C5S2",
-        name="C5S2-ResNet_r2_after"
+        loc="C4S2",
+        name="C4S2-ResNet_r2_after"
     )
     print(df_resnet_after.head())
 
@@ -475,14 +468,14 @@ if __name__ == "__main__":
     # 6. ResNet original
     # ============================
     print(">>> Running MS-FNO R2 AFTER bias compensation ...")
-    df_msfno_after = C5S2_r2_onlypredmodel(
+    df_msfno_after = C4S2_r2_onlypredmodel(
         Intep_cfgpath=INTEP_CFG,
         MSFNO_cfgpath=MSFNO_CFG,
         ResNet_cfgpath=RESNET_CFG,
         predictor="resnet",
         data_name="beamdi_num",
         validdata="beamdi_num_v1000",
-        loc="C5S2",
-        name="C5S2-ResNet_r2_ori"
+        loc="C4S2",
+        name="C4S2-ResNet_r2_ori"
     )
     print(df_msfno_after.head())

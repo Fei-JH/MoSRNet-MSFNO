@@ -2,10 +2,8 @@
 Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
 Date: 2025-08-12 18:06:32
 LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
-LastEditTime: 2025-08-13 21:30:05
-FilePath: \MS-FNO&MoSRNet_clean\models\Baselines.py
+LastEditTime: 2025-10-21 16:15:38
 '''
-
 
 import torch.nn as nn
 import torch.nn.functional as F
@@ -44,14 +42,14 @@ class BasicBlock1D(nn.Module):
 class ResNet(nn.Module):
     def __init__(self, in_channels, embed_dim, out_channels):
         """
-        参数说明:
-          in_channels: 输入通道数
-          mode_length: 模型 mode 的长度
-          freq_length: 频率信息维度
-          embed_dim: 嵌入维度
-          fno_modes: 保留，与原模型一致
-          fno_layers: 不再用于残差模块数，使用 ResNet18-1D 规范 [2,2,2,2]
-          out_channels: 输出通道数
+        Parameter descriptions:
+          in_channels: number of input channels
+          mode_length: length of the model's mode dimension
+          freq_length: dimensionality of the frequency information
+          embed_dim: embedding dimension
+          fno_modes: retained for compatibility with the original model
+          fno_layers: no longer used to specify residual block counts; use ResNet18-1D configuration [2,2,2,2]
+          out_channels: number of output channels
         """
         super().__init__()
         # Embedding layers
@@ -64,7 +62,7 @@ class ResNet(nn.Module):
             nn.ReLU()
         )
 
-        # ResNet18-1D 风格：4 个阶段，每阶段 2 个 BasicBlock1D
+        # ResNet18-1D layers
         self.layer1 = self._make_layer(embed_dim, embed_dim, blocks=2, stride=1)
         self.layer2 = self._make_layer(embed_dim, embed_dim, blocks=2, stride=1)
         self.layer3 = self._make_layer(embed_dim, embed_dim, blocks=2, stride=1)
@@ -76,42 +74,42 @@ class ResNet(nn.Module):
             self.layer4
         )
 
-        # Layer normalization 在输出 projection 之前
+        # Layer normalization 
         self.norm1 = nn.LayerNorm(embed_dim)
-        # 输出层：两层全连接网络
+        # output projection layers
         self.projection1 = nn.Linear(embed_dim, embed_dim // 2)
         self.projection2 = nn.Linear(embed_dim // 2, out_channels)
 
     def _make_layer(self, in_ch, out_ch, blocks, stride):
         layers = []
-        # 第一个 block
+
         layers.append(BasicBlock1D(in_ch, out_ch, stride))
-        # 后续 blocks
+
         for _ in range(1, blocks):
             layers.append(BasicBlock1D(out_ch, out_ch, stride=1))
         return nn.Sequential(*layers)
 
     def forward(self, x):
         """
-        输入:
+        inputs:
           mode_shapes: (batch, in_channels, mode_length)
           frequencies: (batch, in_channels, freq_length)
-        输出:
+        outputs[]:
           out: (batch, mode_length, out_channels)
         """
-        # Embedding & 初步处理
+        # Embedding and transpose to (batch, embed_dim, mode_length)
         x = F.gelu(self.mode_embed(x.transpose(1, 2))).transpose(1, 2)
 
-        # 初始大卷积
+        # intial conv
         x = self.initial_conv(x)
-        # ResNet18-1D 风格特征提取
+        # ResNet18-1D 
         x = self.resnet_layers(x)
 
-        # 准备 LayerNorm，shape 转为 (batch, mode_length, embed_dim)
+        # LayerNorm
         x = x.transpose(1, 2)
         x = self.norm1(x)
 
-        # 输出预测
+        # projection to output
         x = self.projection1(x)
         out = self.projection2(x)
         return out

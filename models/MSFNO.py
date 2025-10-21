@@ -1,3 +1,9 @@
+'''
+Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
+Date: 2025-08-12 18:06:32
+LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
+LastEditTime: 2025-10-21 16:11:45
+'''
 # ------------------------------------------------------------------------------------
 # This script includes code adapted from the Neural Operator project:
 # https://github.com/neuraloperator/neuraloperator

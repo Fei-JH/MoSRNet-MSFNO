@@ -2,9 +2,8 @@
 Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
 Date: 2025-08-12 18:06:31
 LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
-LastEditTime: 2025-08-14 16:47:07
+LastEditTime: 2025-10-21 16:07:04
 '''
-
 
 import os
 import yaml
@@ -306,9 +305,8 @@ def train_1d(config,
     torch.save(model.state_dict(), final_model_path)
 
     flat_data = []
-    # Use length of one of the lists as epoch count, here history["T_loss"]记录了每个epoch的指标
     for idx in range(len(history["T_loss"])):
-        row = {"epoch": idx + 1}  # 如果希望 epoch 从1开始显示
+        row = {"epoch": idx + 1}  # epoch starts from 1
         for key, value in history.items():
             if isinstance(value, dict):
                 for subkey, subvalues in value.items():
@@ -320,10 +318,8 @@ def train_1d(config,
                 row[key] = value[idx]
         flat_data.append(row)
     
-    # 获取所有列名
     columns = ["epoch"] + list(flat_data[0].keys())[1:]
     
-    # 保存 CSV
     with open(os.path.join(loss_path, "history_output.csv"), "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=columns)
         writer.writeheader()

@@ -2,10 +2,8 @@
 Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
 Date: 2025-08-12 18:06:32
 LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
-LastEditTime: 2025-08-13 20:22:40
-FilePath: \MS-FNO&MoSRNet_clean\models\MoSRNet.py
+LastEditTime: 2025-10-21 16:12:13
 '''
-
 
 import torch
 import torch.nn as nn
@@ -28,7 +26,7 @@ class Subnetwork(nn.Module):
             nn.GELU(),
             nn.BatchNorm1d(self.dim2),
             nn.Flatten(),
-            nn.Linear(self.dim2 * self.inlen, self.outlen)  # 调整线性层的输入大小
+            nn.Linear(self.dim2 * self.inlen, self.outlen)  
         )
 
     def forward(self, x):
