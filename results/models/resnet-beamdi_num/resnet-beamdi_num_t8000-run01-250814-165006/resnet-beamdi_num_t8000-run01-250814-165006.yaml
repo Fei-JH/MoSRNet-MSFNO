@@ -1,0 +1,100 @@
+data:
+  data: beamdi_num
+  subset: beamdi_num_t8000
+  validset: beamdi_num_v1000
+loss:
+  evaluations:
+  - - R2
+    - - 1
+      - 1
+      - 0
+      - 0
+      - 1
+      - 1
+      - 0
+      - 0
+    - reduction: true
+      size_average: true
+  - - MAE
+    - - 1
+      - 1
+      - 0
+      - 0
+      - 1
+      - 1
+      - 0
+      - 0
+    - reduction: true
+      size_average: true
+  - - MAPE
+    - - 1
+      - 1
+      - 0
+      - 0
+      - 1
+      - 1
+      - 0
+      - 0
+    - reduction: true
+      size_average: true
+  losses:
+  - - LpLoss
+    - 1
+    - - 1
+      - 1
+      - 0
+      - 0
+      - 1
+      - 1
+      - 0
+      - 0
+    - d: 2
+      p: 2
+      reduction: true
+      size_average: true
+model:
+  model: resnet
+  para:
+    embed_dim: 128
+    in_channels: 4
+    out_channels: 1
+  total_params: 916865
+paths:
+  config_path: ./configs\resnet-beamdi_num_t8000-run01-250814-165006.yaml
+  results_path: ./results\resnet-beamdi_num\resnet-beamdi_num_t8000-run01-250814-165006
+project:
+  case: resnet-beamdi_num_t8000-run01-250814-165006
+  description: SHM Framework of MoSRNet and MS-FNO
+  project: resnet-beamdi_num
+randomseed: 114514
+scheduler:
+  decay_rate: 0.975
+  initial_ratio: 0
+  scheduler: ExpLRScheduler
+  warmup_epochs: 20
+system_info:
+  Architecture: AMD64
+  CPU: AMD64 Family 25 Model 97 Stepping 2, AuthenticAMD
+  CPU Cores (Logical): 32
+  CPU Cores (Physical): 16
+  CUDA Version: '12.4'
+  Device Name: DESKTOP-78D5N6S
+  Disk Free: 192 GB
+  Disk Total: 1862 GB
+  GPU: NVIDIA GeForce RTX 4090
+  GPU Count: 1
+  Platform: Windows
+  PyTorch Version: !!python/object/new:torch.torch_version.TorchVersion
+  - 2.4.0+cu124
+  Python Version: 3.11.5
+  RAM Available: 34 GB
+  RAM Total: 63 GB
+  Release: '10'
+  Version: 10.0.26100
+train:
+  batch_size: 16
+  epochs: 170
+  in_channels: 3
+  learning_rate: 0.001
+  out_channels: 1
+  weight_decay: 0.01

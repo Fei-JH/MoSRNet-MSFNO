@@ -1,0 +1,112 @@
+data:
+  data: beamdi_num
+  subset: beamdi_num_t8000
+  validset: beamdi_num_v1000
+loss:
+  evaluations:
+  - - R2
+    - - 1
+      - 1
+      - 0
+      - 0
+      - 1
+      - 1
+      - 0
+      - 0
+    - reduction: true
+      size_average: true
+  - - MAE
+    - - 1
+      - 1
+      - 0
+      - 0
+      - 1
+      - 1
+      - 0
+      - 0
+    - reduction: true
+      size_average: true
+  - - MAPE
+    - - 1
+      - 1
+      - 0
+      - 0
+      - 1
+      - 1
+      - 0
+      - 0
+    - reduction: true
+      size_average: true
+  losses:
+  - - LpLoss
+    - 1
+    - - 1
+      - 1
+      - 0
+      - 0
+      - 1
+      - 1
+      - 0
+      - 0
+    - d: 2
+      p: 2
+      reduction: true
+      size_average: true
+model:
+  model: mosrnet
+  para:
+    dim1: 16
+    dim2fct: 2
+    inlen: 9
+    num_subnets: 3
+    outlen: 541
+  total_params: 474135
+paths:
+  config_path: ./configs\mosrnet-beamdi_num_t8000-run01-250814-164957.yaml
+  results_path: ./results\mosrnet-beamdi_num\mosrnet-beamdi_num_t8000-run01-250814-164957
+project:
+  case: mosrnet-beamdi_num_t8000-run01-250814-164957
+  description: 'SHM Framework of MoSRNet and MS-FNO '
+  project: mosrnet-beamdi_num
+randomseed: 114514
+scheduler:
+  decay_rate: 0.97
+  initial_ratio: 1.0e-05
+  scheduler: ExpLRScheduler
+  warmup_epochs: 20
+system_info:
+  Architecture: AMD64
+  CPU: AMD64 Family 25 Model 97 Stepping 2, AuthenticAMD
+  CPU Cores (Logical): 32
+  CPU Cores (Physical): 16
+  CUDA Version: '12.4'
+  Device Name: DESKTOP-78D5N6S
+  Disk Free: 192 GB
+  Disk Total: 1862 GB
+  GPU: NVIDIA GeForce RTX 4090
+  GPU Count: 1
+  Platform: Windows
+  PyTorch Version: !!python/object/new:torch.torch_version.TorchVersion
+  - 2.4.0+cu124
+  Python Version: 3.11.5
+  RAM Available: 34 GB
+  RAM Total: 63 GB
+  Release: '10'
+  Version: 10.0.26100
+train:
+  batch_size: 16
+  down_idx:
+  - 0
+  - 68
+  - 135
+  - 203
+  - 270
+  - 337
+  - 405
+  - 473
+  - 540
+  epochs: 120
+  gt_idx: 541
+  in_channels: 3
+  learning_rate: 0.001
+  weight_decay: 0.01
