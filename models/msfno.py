@@ -30,9 +30,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 class SpectralConv1d(nn.Module):
     def __init__(self, in_channels, out_channels, modes1):
-        super(SpectralConv1d, self).__init__()
+        super().__init__()
         """
         1D Fourier layer. Performs FFT, linear transform, and inverse FFT.
         Args:
@@ -44,7 +45,7 @@ class SpectralConv1d(nn.Module):
         self.out_channels = out_channels
         self.modes1 = modes1
 
-        self.scale = (1 / (in_channels * out_channels))
+        self.scale = 1 / (in_channels * out_channels)
         self.weights1 = nn.Parameter(self.scale * torch.rand(in_channels, out_channels, self.modes1, dtype=torch.cfloat))
 
     def compl_mul1d(self, input, weights):
@@ -66,16 +67,19 @@ class SpectralConv1d(nn.Module):
         Returns:
             Tensor: Output tensor of shape (batch, out_channels, length).
         """
-        batchsize = x.shape[0]
+        batch_size = x.shape[0]
         x_ft = torch.fft.rfft(x)
-        out_ft = torch.zeros(batchsize, self.out_channels, x.size(-1)//2 + 1, device=x.device, dtype=torch.cfloat)
+        out_ft = torch.zeros(
+            batch_size, self.out_channels, x.size(-1) // 2 + 1, device=x.device, dtype=torch.cfloat
+        )
         out_ft[:, :, :self.modes1] = self.compl_mul1d(x_ft[:, :, :self.modes1], self.weights1)
         x = torch.fft.irfft(out_ft, n=x.size(-1))
         return x
 
+
 class FourierLayer(nn.Module):
     def __init__(self, modes, width):
-        super(FourierLayer, self).__init__()
+        super().__init__()
         """
         Fourier layer with spectral convolution and pointwise convolution.
         Args:
@@ -84,7 +88,6 @@ class FourierLayer(nn.Module):
         """
         self.modes1 = modes
         self.width = width
-        self.padding = 2  # Pad the domain if input is non-periodic
         self.convs = SpectralConv1d(self.width, self.width, self.modes1)
         self.ws = nn.Conv1d(self.width, self.width, 1)
         
@@ -96,11 +99,10 @@ class FourierLayer(nn.Module):
         Returns:
             Tensor: Output tensor of shape (batch, width, length).
         """
-        x1 = self.convs(x)
-        x2 = self.ws(x)
-        x = x1 + x2
-        x = F.gelu(x)
-        return x
+        spectral_out = self.convs(x)
+        pointwise_out = self.ws(x)
+        return F.gelu(spectral_out + pointwise_out)
+
 
 class MSFNO(nn.Module):
     def __init__(self, in_channels, mode_length, embed_dim, fno_modes, fno_layers, out_channels):
@@ -114,11 +116,9 @@ class MSFNO(nn.Module):
             fno_layers (int): Number of FNO layers.
             out_channels (int): Output dimension.
         """
-        super(MSFNO, self).__init__()
+        super().__init__()
         self.lifting = nn.Linear(in_channels, embed_dim)
-        self.fno_layers = nn.ModuleList([
-            FourierLayer(fno_modes, embed_dim) for _ in range(fno_layers)
-        ])
+        self.fno_layers = nn.ModuleList([FourierLayer(fno_modes, embed_dim) for _ in range(fno_layers)])
         self.projection1 = nn.Linear(embed_dim, embed_dim // 2)
         self.projection2 = nn.Linear(embed_dim // 2, out_channels)
 

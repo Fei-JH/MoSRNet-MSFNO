@@ -75,7 +75,7 @@ scheduler:
   scheduler: ExpLRScheduler
   warmup_epochs: 20
 status:
-  train_count: 3
+  train_count: 4
   train_history:
   - end_time: '2025-08-14 17:45:37'
     start_time: '2025-08-14 17:12:06'
@@ -83,6 +83,8 @@ status:
     start_time: '2025-08-22 14:08:03'
   - end_time: '2025-08-22 14:47:38'
     start_time: '2025-08-22 14:26:18'
+  - end_time: null
+    start_time: '2025-12-23 15:55:44'
 train:
   batch_size: 16
   epochs: 170

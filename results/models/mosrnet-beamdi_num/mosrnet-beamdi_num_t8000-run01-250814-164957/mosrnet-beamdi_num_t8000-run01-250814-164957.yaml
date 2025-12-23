@@ -63,7 +63,7 @@ model:
   total_params: 474135
 paths:
   config_path: ./configs\mosrnet-beamdi_num_t8000-run01-250814-164957.yaml
-  results_path: ./results\mosrnet-beamdi_num\mosrnet-beamdi_num_t8000-run01-250814-164957
+  results_path: ./results/models\mosrnet-beamdi_num\mosrnet-beamdi_num_t8000-run01-250814-164957
 project:
   case: mosrnet-beamdi_num_t8000-run01-250814-164957
   description: 'SHM Framework of MoSRNet and MS-FNO '
@@ -79,20 +79,20 @@ system_info:
   CPU: AMD64 Family 25 Model 97 Stepping 2, AuthenticAMD
   CPU Cores (Logical): 32
   CPU Cores (Physical): 16
-  CUDA Version: '12.4'
-  Device Name: DESKTOP-78D5N6S
-  Disk Free: 192 GB
-  Disk Total: 1862 GB
-  GPU: NVIDIA GeForce RTX 4090
+  CUDA Version: '12.6'
+  Device Name: FEI
+  Disk Free: 251 GB
+  Disk Total: 475 GB
+  GPU: NVIDIA GeForce RTX 3060
   GPU Count: 1
   Platform: Windows
   PyTorch Version: !!python/object/new:torch.torch_version.TorchVersion
-  - 2.4.0+cu124
-  Python Version: 3.11.5
-  RAM Available: 34 GB
-  RAM Total: 63 GB
-  Release: '10'
-  Version: 10.0.26100
+  - 2.7.0+cu126
+  Python Version: 3.12.10
+  RAM Available: 100 GB
+  RAM Total: 127 GB
+  Release: '11'
+  Version: 10.0.26200
 train:
   batch_size: 16
   down_idx:

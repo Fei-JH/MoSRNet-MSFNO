@@ -7,12 +7,11 @@ LastEditTime: 2025-10-21 16:12:13
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-                      
+
     
 class Subnetwork(nn.Module):
     def __init__(self, dim1, dim2fct, inlen, outlen):
-        super(Subnetwork, self).__init__()
+        super().__init__()
         self.dim1 = dim1
         self.dim2fct = dim2fct
         self.inlen = inlen
@@ -30,12 +29,13 @@ class Subnetwork(nn.Module):
         )
 
     def forward(self, x):
-        x = self.layers(x)
-        return x
+        return self.layers(x)
 
-# === Wrapper network remains unchanged, just swap sub-net ===
+
 class MoSRNet(nn.Module):
-    def __init__(self, dim1: int = 32, dim2fct: int = 2, inlen:int = 5, outlen: int = 541, num_subnets: int = 3):
+    def __init__(
+        self, dim1: int = 32, dim2fct: int = 2, inlen: int = 5, outlen: int = 541, num_subnets: int = 3
+    ):
         super().__init__()
         self.subnets = nn.ModuleList([
             Subnetwork(dim1=dim1, dim2fct=dim2fct, inlen=inlen, outlen=outlen)
@@ -43,9 +43,9 @@ class MoSRNet(nn.Module):
         ])
 
     def forward(self, x):
-        # x shape : (B, num_subnets, L)
+        # x shape: (batch, num_subnets, length)
         outputs = []
-        for i, sulnet in enumerate(self.subnets):
-            out = sulnet(x[:, i:i+1, :])  # (B, 1, L)
+        for i, subnet in enumerate(self.subnets):
+            out = subnet(x[:, i : i + 1, :])  # (batch, 1, length)
             outputs.append(out.squeeze(1))  # (B, L)
-        return torch.stack(outputs, dim=1)  # (B, num_subnets, L)
+        return torch.stack(outputs, dim=1)  # (batch, num_subnets, length)

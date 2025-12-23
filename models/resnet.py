@@ -80,13 +80,13 @@ class ResNet(nn.Module):
         self.projection1 = nn.Linear(embed_dim, embed_dim // 2)
         self.projection2 = nn.Linear(embed_dim // 2, out_channels)
 
-    def _make_layer(self, in_ch, out_ch, blocks, stride):
+    def _make_layer(self, in_channels, out_channels, blocks, stride):
         layers = []
 
-        layers.append(BasicBlock1D(in_ch, out_ch, stride))
+        layers.append(BasicBlock1D(in_channels, out_channels, stride))
 
         for _ in range(1, blocks):
-            layers.append(BasicBlock1D(out_ch, out_ch, stride=1))
+            layers.append(BasicBlock1D(out_channels, out_channels, stride=1))
         return nn.Sequential(*layers)
 
     def forward(self, x):
@@ -100,9 +100,9 @@ class ResNet(nn.Module):
         # Embedding and transpose to (batch, embed_dim, mode_length)
         x = F.gelu(self.mode_embed(x.transpose(1, 2))).transpose(1, 2)
 
-        # intial conv
+        # Initial conv
         x = self.initial_conv(x)
-        # ResNet18-1D 
+        # ResNet18-1D
         x = self.resnet_layers(x)
 
         # LayerNorm

@@ -1,81 +1,87 @@
-'''
+"""
 Author: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
 Date: 2025-08-12 18:06:19
 LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
 LastEditTime: 2025-10-21 15:28:23
-'''
+"""
 
-import matplotlib.pyplot as plt
 import os
-import yaml
-import pandas as pd
-import matplotlib.pyplot as plt
+
 import matplotlib
-
-matplotlib.rcParams['font.family'] = 'Times New Roman'
-matplotlib.rcParams['font.size'] = 24
-matplotlib.rcParams['axes.labelsize'] = 24
-matplotlib.rcParams['legend.fontsize'] = 24
-matplotlib.rcParams['axes.titlesize'] = 24
-matplotlib.rcParams['xtick.labelsize'] = 24 
-matplotlib.rcParams['ytick.labelsize'] = 24
-
-#%% Training and validation loss curves of MS-FNO and RseNet
-import os
-import yaml
-import pandas as pd
 import matplotlib.pyplot as plt
+import pandas as pd
+import yaml
+
+
+def set_plot_style():
+    """Apply global Matplotlib style for postprocess figures."""
+    matplotlib.rcParams.update(
+        {
+            "font.family": "Times New Roman",
+            "font.size": 24,
+            "axes.labelsize": 24,
+            "legend.fontsize": 24,
+            "axes.titlesize": 24,
+            "xtick.labelsize": 24,
+            "ytick.labelsize": 24,
+        }
+    )
+
+
+set_plot_style()
+
 
 def C3S4_losscurve(
-    model_cfgpath,
-    dir = r"./results/postprocessed",
-    type = "fig",
-    loc = "C3S4",
-    name = "Training and validation loss curves of MS-FNO and RseNet"
+    model_cfg_path,
+    output_dir="./results/postprocessed",
+    output_type="fig",
+    output_loc="C3S4",
+    output_name="Training and validation loss curves of MS-FNO and RseNet",
 ):
+    """Plot training and validation loss curves for a single model config."""
+    line_width = 2
+    bg_color = "#FFFEFC"
 
-    linewidth = 2
-    bg_color = "#FFFEFC"  
+    # --- Load config ---
+    with open(f"./configs/{model_cfg_path}", "r", encoding="utf-8") as f:
+        model_cfg = yaml.safe_load(f)
 
-    # ---- Load configs ----
-    with open(f"./configs/{model_cfgpath}", "r") as f:
-        model_cfg = yaml.load(f, Loader=yaml.SafeLoader)
+    # --- CSV path ---
+    model_loss_csv = os.path.join(model_cfg["paths"]["results_path"], "loss/history_output.csv")
 
+    # --- Read CSV ---
+    model_df = pd.read_csv(model_loss_csv)
 
-    # ---- CSV paths ----
-    model_losscsv = os.path.join(model_cfg["paths"]["results_path"], "loss/history_output.csv")
-    
-    # ---- Read CSV ----
-    model_df = pd.read_csv(model_losscsv)
-
-    # ---- Check columns ----
+    # --- Check columns ---
     if not {"T_loss", "V_loss"}.issubset(model_df.columns):
         raise KeyError(f"{model_df} CSV missing required columns 'T_loss' and/or 'V_loss'.")
 
-    # ---- Extract ----
+    # --- Extract ---
     model_t = model_df["Tloss_LpLoss.mean"].values
     model_v = model_df["Vloss_LpLoss.mean"].values
-    
-    x_indicies = range(len(model_t))
-    
+    x_indices = range(len(model_t))
 
-    # ---- Plot ----
+    # --- Plot ---
     fig, ax = plt.subplots(figsize=(8, 6))
     ax.set_facecolor(bg_color)
 
-    # plot training loss (black, bottom)
     ax.plot(
-        x_indicies, model_t,
-        label="Training loss", color="k", linewidth=linewidth, zorder=1
+        x_indices,
+        model_t,
+        label="Training loss",
+        color="k",
+        linewidth=line_width,
+        zorder=1,
+    )
+    ax.plot(
+        x_indices,
+        model_v,
+        label="Validation loss",
+        color="r",
+        linewidth=line_width,
+        zorder=2,
     )
 
-    # plot validation loss (red, upper)
-    ax.plot(
-        x_indicies, model_v,
-        label="Validation loss", color="r", linewidth=linewidth, zorder=2
-    )
-
-    # axis formatting
     ax.set_xlim(-10, 180)
     ax.set_xticks([0, 20, 45, 70, 95, 120, 145, 170])
     ax.set_ylim(0.001, 2)
@@ -86,8 +92,7 @@ def C3S4_losscurve(
     ax.grid(True, which="both", linestyle="--", alpha=0.3)
     ax.legend(loc="upper right")
 
-    # auto title based on config filename
-    cfg_lower = model_cfgpath.lower()
+    cfg_lower = model_cfg_path.lower()
     if "mosrnet" in cfg_lower:
         title = "(a)"
     elif "msfno" in cfg_lower:
@@ -97,32 +102,30 @@ def C3S4_losscurve(
     else:
         title = ""
     ax.set_title("", pad=25)
-
     ax.set_title(title)
+
     plt.tight_layout()
 
-    save_path = os.path.join(dir, loc, type)
+    save_path = os.path.join(output_dir, output_loc, output_type)
     os.makedirs(save_path, exist_ok=True)
-    fig.savefig(os.path.join(save_path, f"{name}_{title}.png"), dpi=300, bbox_inches="tight")
-    print(f"Figure saved to {os.path.join(save_path, f'{name}_{title}.png')}")
+    fig.savefig(
+        os.path.join(save_path, f"{output_name}_{title}.png"),
+        dpi=300,
+        bbox_inches="tight",
+    )
+    print(f"Figure saved to {os.path.join(save_path, f'{output_name}_{title}.png')}")
     plt.close(fig)
 
 
-# %%
-MSFNO_cfgpath = "msfno-beamdi_num_t8000-run01-250814-165002.yaml"
-ResNet_cfgpath = "resnet-beamdi_num_t8000-run01-250814-165006.yaml"
-MoSRNet_cfgpath = "mosrnet-beamdi_num_t8000-run01-250814-164957.yaml"
+MSFNO_CFG = "msfno-beamdi_num_t8000-run01-250814-165002.yaml"
+RESNET_CFG = "resnet-beamdi_num_t8000-run01-250814-165006.yaml"
+MOSRNET_CFG = "mosrnet-beamdi_num_t8000-run01-250814-164957.yaml"
+
+
+def main():
+    for cfg_path in (MOSRNET_CFG, MSFNO_CFG, RESNET_CFG):
+        C3S4_losscurve(model_cfg_path=cfg_path)
+
 
 if __name__ == "__main__":
-    C3S4_losscurve(
-    model_cfgpath=MoSRNet_cfgpath
-    )
-
-    C3S4_losscurve(
-    model_cfgpath=MSFNO_cfgpath
-    )
-
-    C3S4_losscurve(
-    model_cfgpath=ResNet_cfgpath
-    )
-    
+    main()

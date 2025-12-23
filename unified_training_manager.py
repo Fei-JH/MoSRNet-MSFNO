@@ -5,7 +5,6 @@ LastEditors: Fei-JH fei.jinghao.53r@st.kyoto-u.ac.jp
 LastEditTime: 2025-10-21 15:17:50
 '''
 
-import os
 import sys
 import yaml
 import time
@@ -335,9 +334,12 @@ def main() -> None:
 
     # Build config selection map
     configs_map: Dict[str, str] = {}
-    if args.mosrnet_configs: configs_map["mosrnet"] = args.mosrnet_configs
-    if args.msfno_configs:   configs_map["msfno"]   = args.msfno_configs
-    if args.resnet_configs:  configs_map["resnet"]  = args.resnet_configs
+    if args.mosrnet_configs:
+        configs_map["mosrnet"] = args.mosrnet_configs
+    if args.msfno_configs:
+        configs_map["msfno"] = args.msfno_configs
+    if args.resnet_configs:
+        configs_map["resnet"] = args.resnet_configs
 
     # Build all tasks upfront
     tasks = build_tasks(
