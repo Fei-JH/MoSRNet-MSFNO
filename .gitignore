@@ -3,4 +3,3 @@
 wandb/
 __pycache__/
 *.py[cod]
-results

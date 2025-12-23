@@ -32,7 +32,6 @@ def run_train_1d(config, config_name, device, model_class, use_wandb=False, swee
     
     system_info = kit.get_system_info()
     
-    # Wandb初始化（如果使用）
     try:
         import wandb
         wandb_loaded = True
@@ -71,7 +70,7 @@ def run_train_1d(config, config_name, device, model_class, use_wandb=False, swee
     valid_dataset = TensorDataset(valid_dict['mode'], valid_dict['dmg'])
     valid_loader = DataLoader(valid_dataset, batch_size=config["train"]["batch_size"], shuffle=False)
     
-    # 模型初始化：参数依次为
+    # model initialization
     # (in_channels, mode_in_dim, freq_in_dim, embed_dim, fno_modes, fno_layers, out_channels)
     model = model_class(**config["model"]["para"]).to(device)
     
